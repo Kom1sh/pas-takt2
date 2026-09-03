@@ -7,295 +7,266 @@
 <style>
 /*FONTS*/
 
-/* ============ tokens ============ */
+/* ============ токены ============ */
 :root{
-  --void:#0A0C14;          /* ночной сине-чёрный, не бурый */
-  --void-2:#111524;
-  --rule:#1E2436;
-  --rule-hi:#2E3750;
-  --yellow:#FCEE0A;        /* RESERVED: объект конкуренции — 16:1 к фону */
-  --cyan:#22E0F0;          /* структура: уровни, карта — 12:1 */
-  --red:#FF3355;           /* RESERVED: горлышко / отказ — 5.5:1 */
-  --bone:#F2EFE6;          /* основной текст — 17:1 */
-  --dim:#AEB4C4;           /* вторичный текст — 9.3:1, было 2.6:1 */
-  --dim-2:#7A8299;         /* метаданные — 5.1:1 */
-
-  --d:'Oswald', 'Arial Narrow', 'Haettenschweiler', sans-serif;
-  --b:'Geologica', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --paper:#F1ECE3;      /* кремовая бумага — основной фон */
+  --paper-2:#E7E1D5;    /* вторая бумага, для полос и заливок */
+  --tile:#FFFFFF;       /* плитки логотипов и карточки */
+  --ink:#16140F;        /* текст, 15:1 к бумаге */
+  --muted:#6B6558;      /* вторичный текст, 5.6:1 к бумаге */
+  --hair:#D3CCBE;       /* линейки */
+  --jet:#14130F;        /* полноэкранные тёмные слайды */
+  --flame:#F26A1B;      /* единственный акцент */
+  --flame-ink:#B34405;  /* оранжевый для мелкого текста на бумаге, 4.8:1 */
+  --sage:#DCE2D9;       /* мягкая карточка */
+  --f:'Onest','Segoe UI',system-ui,-apple-system,sans-serif;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--void);overflow:hidden}
-body{font-family:var(--b);color:var(--bone);-webkit-font-smoothing:antialiased}
+html,body{height:100%;background:#0E0D0B;overflow:hidden}
+body{font-family:var(--f);color:var(--ink);-webkit-font-smoothing:antialiased}
 
-/* ============ 16:9 stage ============ */
-#stage{position:fixed;inset:0;overflow:hidden;background:var(--void)}
-#deck::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;
-  background:radial-gradient(120% 85% at 50% 0%,rgba(52,66,110,.28),rgba(10,12,20,0) 62%)}
-/* absolute centring: a scaled box larger than the viewport must not rely on
-   layout alignment, or it overflows to one side and gets clipped */
-#deck{
-  position:absolute;left:50%;top:50%;width:1600px;height:900px;
+/* ============ сцена 16:9 ============ */
+#stage{position:fixed;inset:0;overflow:hidden;background:#0E0D0B}
+#deck{position:absolute;left:50%;top:50%;width:1600px;height:900px;
   transform:translate(-50%,-50%) scale(var(--s,1));transform-origin:center center;
-  background:var(--void);overflow:hidden;
-}
+  background:var(--paper);overflow:hidden}
 
-/* faint industrial grid — sits under everything, never competes */
-#deck::before{
-  content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
-  background-image:linear-gradient(var(--rule) 1px,transparent 1px),
-                   linear-gradient(90deg,var(--rule) 1px,transparent 1px);
-  background-size:100px 100px;opacity:.55;
-}
-
-/* ============ persistent layer gauge (left rail) ============ */
-#rail{position:absolute;left:0;top:0;bottom:0;width:86px;z-index:7;
-  border-right:1px solid var(--rule-hi);background:linear-gradient(180deg,#0F1422,#0A0C14)}
-#rail .rl{position:absolute;left:31px;top:118px;bottom:96px;width:1px;background:var(--rule-hi)}
-.tick{position:absolute;left:0;width:86px;height:22px;display:flex;align-items:center;gap:9px;padding-left:18px;
-  transition:opacity .3s ease}
-.tick i{display:block;width:27px;height:2px;background:var(--dim-2);flex:none;transition:all .35s cubic-bezier(.2,.8,.2,1)}
-.tick b{font-family:var(--d);font-weight:500;font-size:14px;color:var(--dim-2);line-height:1;
-  font-variant-numeric:tabular-nums;transition:color .35s ease}
-.tick[data-neck] i{background:#6B2437}
-.tick.on i{background:var(--cyan);width:44px;box-shadow:0 0 14px rgba(20,227,240,.55)}
-.tick.on b{color:var(--cyan)}
-.tick.on[data-neck] i{background:var(--red);box-shadow:0 0 14px rgba(255,46,77,.6)}
-.tick.on[data-neck] b{color:var(--red)}
-#rail .cap{position:absolute;left:18px;font-family:var(--d);font-weight:500;font-size:11px;
-  letter-spacing:.14em;color:var(--dim-2);writing-mode:vertical-rl}
-#rail .cap.t{top:34px}
-#rail .cap.b{bottom:30px}
-
-/* ============ slide chrome ============ */
-.s{position:absolute;inset:0;z-index:3;padding:64px 88px 76px 150px;
-  opacity:0;visibility:hidden;pointer-events:none;display:flex;flex-direction:column}
+/* ============ слайд ============ */
+.s{position:absolute;inset:0;z-index:3;padding:62px 78px 66px;
+  opacity:0;visibility:hidden;pointer-events:none;
+  display:flex;flex-direction:column;background:var(--paper)}
 .s.live{opacity:1;visibility:visible;pointer-events:auto}
+.s.dark{background:var(--jet);color:var(--paper)}
+.s.hot{background:var(--flame);color:var(--ink)}
 
-/* top meta bar */
-.meta{position:absolute;top:34px;left:150px;right:88px;display:flex;justify-content:space-between;
-  align-items:baseline;font-family:var(--d);font-weight:500;font-size:13px;letter-spacing:.15em;color:var(--dim)}
-.meta .num{color:var(--dim-2);font-variant-numeric:tabular-nums}
-.meta .num em{font-style:normal;color:var(--bone)}
+/* верхняя строка: пилюля слева, счётчик справа */
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:34px;flex:none}
+/* на слайдах с прижатым/центрированным контентом шапка всё равно держится сверху */
+.cover .top,.sec .top{margin-bottom:auto}
+.pill{display:inline-flex;align-items:center;height:31px;padding:0 17px;border-radius:999px;
+  border:1.5px solid var(--ink);font-size:12.5px;font-weight:600;letter-spacing:.09em;
+  text-transform:uppercase;white-space:nowrap}
+.dark .pill{border-color:rgba(241,236,227,.42);color:var(--paper)}
+.hot .pill{border-color:rgba(22,20,15,.5)}
+.cnt{font-size:13px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.dark .cnt{color:rgba(241,236,227,.55)}
+.hot .cnt{color:rgba(22,20,15,.62)}
 
-/* bottom hairline */
-.s::after{content:"";position:absolute;left:150px;right:88px;bottom:44px;height:1px;background:var(--rule-hi)}
+/* ============ типографика ============ */
+h1{font-weight:900;letter-spacing:-.035em;line-height:1.0;text-transform:uppercase}
+h2{font-weight:800;font-size:52px;letter-spacing:-.028em;line-height:1.04}
+h3{font-weight:700;font-size:21px;letter-spacing:-.012em;line-height:1.2}
+p{font-size:19.5px;line-height:1.52;max-width:76ch}
+.lede{font-size:24px;line-height:1.42;font-weight:400}
+.mut{color:var(--muted)}
+.dark .mut{color:rgba(241,236,227,.66)}
+.hot .mut{color:rgba(22,20,15,.72)}
+strong{font-weight:700}
+b{font-weight:700}
+.ob{color:var(--flame-ink);font-weight:600}       /* объект конкуренции */
+.dark .ob,.hot .ob{color:var(--flame)}
+.dark .ob{color:#FF8B3D}
+.hot .ob{color:var(--ink);text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:2px}
 
-h1{font-family:var(--d);font-weight:700;letter-spacing:-.005em;line-height:.94;color:var(--bone)}
-h2{font-family:var(--d);font-weight:700;font-size:56px;line-height:1.08;letter-spacing:-.005em;color:var(--bone)}
-h3{font-family:var(--d);font-weight:500;font-size:22px;line-height:1.2;color:var(--cyan);letter-spacing:.02em}
-p{font-size:21px;line-height:1.5;color:var(--bone);max-width:74ch}
-.lede{font-size:26px;line-height:1.42}
-.mut{color:var(--dim)}
-strong{font-weight:600;color:#fff}
-.ob{color:var(--yellow)}        /* объект конкуренции — ONLY */
-.nk{color:var(--red)}           /* горлышко — ONLY */
-.cy{color:var(--cyan)}
-
-/* reveal: staggered, fires on slide entry */
-.r{opacity:0;transform:translateY(14px)}
-.s.live .r{animation:rise .5s cubic-bezier(.2,.8,.2,1) forwards;animation-delay:calc(var(--i,0)*70ms + 120ms)}
+/* появление */
+.r{opacity:0;transform:translateY(12px)}
+.s.live .r{animation:rise .46s cubic-bezier(.22,.75,.2,1) forwards;animation-delay:calc(var(--i,0)*58ms + 90ms)}
 @keyframes rise{to{opacity:1;transform:none}}
 
-/* ============ title slide ============ */
-.title{justify-content:center;padding-left:150px}
-.title h1{font-size:188px;letter-spacing:-.02em;line-height:1.03}
-.title .glow{color:var(--yellow);text-shadow:0 0 60px rgba(252,238,10,.30)}
-.title .sub{font-family:var(--d);font-weight:500;font-size:34px;letter-spacing:.02em;color:var(--bone);margin-top:22px}
-.title .tag{font-size:19px;color:var(--dim);margin-top:20px;max-width:60ch;line-height:1.5}
-.title .bar{width:132px;height:5px;background:var(--yellow);margin:36px 0 0}
+/* ============ обложка ============ */
+.cover{justify-content:flex-end;overflow:hidden}
+.cover h1{font-size:150px;line-height:1.0;padding-top:.02em}
+.cover .sub{font-size:27px;font-weight:500;line-height:1.28;margin-top:26px;max-width:30ch}
+.cover .meta-b{display:flex;gap:44px;margin-top:44px;padding-top:24px;
+  border-top:2px solid rgba(22,20,15,.28);font-size:15px;font-weight:600;letter-spacing:.03em}
+.rays{position:absolute;right:-190px;top:-230px;width:720px;height:720px;opacity:.5;pointer-events:none}
 
-/* ============ the map ============ */
-.map{width:100%;border-top:1px solid var(--rule-hi);flex:1;display:flex;flex-direction:column}
-.row{display:grid;grid-template-columns:30px 300px 1fr 290px;align-items:center;gap:0 22px;
-  border-bottom:1px solid var(--rule);min-height:60px;padding:5px 0;position:relative;flex:1}
-.row .n{font-family:var(--d);font-weight:500;font-size:15px;color:var(--dim-2);font-variant-numeric:tabular-nums}
-.row .lvl{font-family:var(--d);font-weight:700;font-size:23px;letter-spacing:.012em;color:var(--bone);line-height:1.1}
-.row .obj{font-size:19px;line-height:1.25;color:var(--yellow);font-weight:400}
-.row .who{font-size:15px;line-height:1.34;color:var(--dim);text-align:right}
-.row.neck{background:linear-gradient(90deg,rgba(255,46,77,.13),rgba(255,46,77,0) 76%)}
-.row.neck .lvl{color:var(--red)}
-.row.neck .n{color:var(--red)}
-.row.neck::before{content:"";position:absolute;left:-24px;top:0;bottom:0;width:3px;background:var(--red)}
-.maphead{display:grid;grid-template-columns:30px 300px 1fr 290px;gap:0 22px;padding-bottom:9px;
-  font-family:var(--d);font-weight:500;font-size:12.5px;letter-spacing:.16em;color:var(--dim-2)}
-.maphead .r3{text-align:right}
+/* ============ разделитель раздела ============ */
+.sec{justify-content:center}
+.sec .huge{position:absolute;right:78px;top:44px;font-size:250px;font-weight:900;
+  letter-spacing:-.05em;line-height:.8;color:var(--flame)}
+.sec h1{font-size:104px;max-width:14ch}
+.sec .note{margin-top:28px;font-size:19px;line-height:1.5;max-width:52ch;color:rgba(241,236,227,.72)}
+
+/* ============ карта уровней ============ */
+.map{flex:1;display:flex;flex-direction:column;gap:7px;min-height:0}
+.lvl{display:grid;grid-template-columns:52px 226px 1fr auto;align-items:center;gap:0 22px;
+  background:var(--tile);border-radius:13px;padding:9px 18px 9px 14px;flex:1;min-height:0}
+.lvl .no{font-size:19px;font-weight:800;color:var(--muted);font-variant-numeric:tabular-nums;
+  text-align:center;letter-spacing:-.02em}
+.lvl .nm{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.lvl .oj{font-size:18.5px;font-weight:600;color:var(--flame-ink);line-height:1.22}
+.lvl .who{display:flex;align-items:center;gap:15px;justify-content:flex-end;min-width:346px}
+.lvl .who svg{width:30px;height:30px;flex:none}
+.lvl .who .txt{font-size:13px;color:var(--muted);line-height:1.28;text-align:right;max-width:186px}
+.lvl.neck{background:var(--jet)}
+.lvl.neck .nm{color:var(--flame)}
+.lvl.neck .no{color:rgba(242,106,27,.75)}
+.lvl.neck .oj{color:#FF9A52}
+.lvl.neck .who .txt{color:rgba(241,236,227,.62)}
+.maphead{display:grid;grid-template-columns:52px 226px 1fr auto;gap:0 22px;padding:0 18px 9px 14px;
+  font-size:11.5px;font-weight:700;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);flex:none}
+.maphead span:last-child{min-width:346px;text-align:right}
 
 /* ============ логотипы ============ */
-.lg{display:inline-flex;align-items:center;gap:11px;flex-wrap:wrap}
-.lg svg{width:27px;height:27px;fill:currentColor;flex:none;opacity:.95}
-.lg.big svg{width:34px;height:34px}
-.lg.sm svg{width:18px;height:18px}
-.row .who .lg{justify-content:flex-end;gap:13px;color:var(--bone);margin-bottom:6px}
-.row .who .fig{display:block;font-size:13.5px;color:var(--dim-2);line-height:1.3}
-.row.neck .who .lg{color:var(--red)}
-.nologo{font-size:13.5px;color:var(--dim-2);line-height:1.4;font-style:italic;display:block;max-width:280px;margin-left:auto}
+.ic{fill:currentColor}
+.lvl.neck .who .ic{color:var(--paper)!important}
 
-/* ============ generic blocks ============ */
-.cols{display:grid;gap:30px;margin-top:28px}
+/* ============ плитки логотипов ============ */
+.wall{display:grid;gap:11px;flex:1;min-height:0}
+.tile{background:var(--tile);border-radius:13px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:9px;padding:13px 8px;min-height:0}
+.tile svg{width:54px;height:54px;flex:none}
+.tile .nmb{font-size:12.5px;font-weight:600;color:var(--muted);text-align:center;line-height:1.2}
+.tile.wide{flex-direction:row;gap:14px;justify-content:flex-start;padding:15px 18px}
+.tile.wide svg{width:34px;height:34px}
+.tile.wide .nmb{text-align:left;font-size:14.5px;color:var(--ink);font-weight:700}
+.wallgrp{display:flex;flex-direction:column;gap:9px;min-height:0}
+.wallgrp .cap{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);flex:none}
+.wallgrp .grid{display:grid;gap:9px;flex:1;min-height:0}
+
+/* ============ карточки ============ */
+.cards{display:grid;gap:15px}
+/* только прямой потомок слайда растёт: вложенные сетки остаются по контенту */
+.s > .cards{flex:1;min-height:0}
+.s > .cards > .card{min-height:0}
 .c2{grid-template-columns:1fr 1fr}
 .c3{grid-template-columns:repeat(3,1fr)}
-.blk{border-top:2px solid var(--rule-hi);padding-top:15px}
-.blk.y{border-top-color:var(--yellow)}
-.blk.c{border-top-color:var(--cyan)}
-.blk.r_{border-top-color:var(--red)}
-.blk h4{font-family:var(--d);font-weight:700;font-size:22px;line-height:1.14;margin-bottom:9px;color:var(--bone)}
-.blk p{font-size:17.5px;line-height:1.5;color:var(--dim)}
-.blk p + p{margin-top:9px}
+.c4{grid-template-columns:repeat(4,1fr)}
+.card{background:var(--tile);border-radius:15px;padding:22px 24px;display:flex;flex-direction:column}
+.card.sage{background:var(--sage)}
+.card.dark{background:var(--jet);color:var(--paper)}
+.card.dark .mut{color:rgba(241,236,227,.7)}
+.card.hot{background:var(--flame)}
+.card h4{font-size:21px;font-weight:800;letter-spacing:-.018em;line-height:1.14;margin-bottom:11px}
+.card p{font-size:17px;line-height:1.5;color:var(--muted)}
+.card.dark p{color:rgba(241,236,227,.74)}
+.card.hot p{color:rgba(22,20,15,.8)}
+.card p+p{margin-top:9px}
+.card .kn{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--flame-ink);margin-bottom:9px}
+.card.dark .kn{color:var(--flame)}
 
+/* списки */
 ul{list-style:none}
-li{position:relative;padding-left:26px;font-size:20px;line-height:1.44;margin-bottom:13px;max-width:70ch}
-li::before{content:"";position:absolute;left:0;top:.62em;width:12px;height:2px;background:var(--cyan)}
-li.y::before{background:var(--yellow)}
-li.r_::before{background:var(--red)}
+li{position:relative;padding-left:23px;font-size:18px;line-height:1.48;margin-bottom:11px}
+li::before{content:"";position:absolute;left:0;top:.62em;width:10px;height:10px;border-radius:50%;
+  background:var(--flame)}
+.dark li::before{background:var(--flame)}
 
-/* before / after */
-.balist{flex:1;display:flex;flex-direction:column;border-top:1px solid var(--rule-hi)}
-.ba{flex:1;display:grid;grid-template-columns:1fr 46px 1fr;align-items:center;gap:0 16px;
-  border-bottom:1px solid var(--rule);padding:13px 0}
-.ba .was{font-size:18.5px;color:var(--dim-2);text-decoration:line-through;text-decoration-color:#4E5670}
-.ba .arw{color:var(--dim-2);text-align:center;font-size:19px}
-.ba .now{font-size:19.5px;color:var(--bone)}
-.ba .now em{font-style:normal;color:var(--yellow)}
+/* ============ крупные числа ============ */
+.figs{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+.fig{padding-right:34px}
+.fig+.fig{padding-left:34px;border-left:1.5px solid var(--hair)}
+.dark .fig+.fig{border-left-color:rgba(241,236,227,.2)}
+.fig .n{font-size:88px;font-weight:900;letter-spacing:-.05em;line-height:.88;color:var(--flame-ink)}
+.dark .fig .n{color:var(--flame)}
+.fig .l{font-size:15.5px;line-height:1.42;color:var(--muted);margin-top:14px}
+.dark .fig .l{color:rgba(241,236,227,.7)}
 
-/* chain of dependency */
-.chain{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:32px;flex:1;align-items:stretch}
-.ch{border-left:2px solid var(--rule-hi);padding:4px 20px 0 17px;position:relative;display:flex;flex-direction:column}
-.chain .ch:last-child{border-right:2px solid var(--rule-hi)}
-.ch .v{margin-top:auto;padding-bottom:6px;font-size:18px;font-weight:600;color:#fff}
-.ch.dead .v{color:var(--red)}
-.ch:first-child{border-left-color:var(--cyan)}
-.ch.dead{border-left-color:var(--red)}
-.ch .q{font-family:var(--d);font-weight:700;font-size:19px;color:var(--bone);margin-bottom:8px;line-height:1.16}
-.ch .a{font-size:16.5px;line-height:1.42;color:var(--dim)}
-.ch.dead .q{color:var(--red)}
+/* ============ до / после ============ */
+.ba{flex:1;display:flex;flex-direction:column;gap:7px;min-height:0}
+.barow{display:grid;grid-template-columns:1fr 34px 1.32fr;align-items:center;gap:0 18px;
+  background:var(--tile);border-radius:12px;padding:11px 20px;flex:1;min-height:0}
+.barow .was{font-size:16.5px;color:var(--muted);text-decoration:line-through;
+  text-decoration-color:var(--hair);text-decoration-thickness:1.5px}
+.barow .ar{color:var(--flame);font-weight:800;font-size:19px;text-align:center}
+.barow .now{font-size:17.5px;line-height:1.34}
+.barow .now b{font-weight:700}
 
-/* stat */
-.stat{font-family:var(--d);font-weight:700;font-size:82px;line-height:.9;color:var(--yellow);
-  font-variant-numeric:tabular-nums;letter-spacing:-.015em}
-.stat.r_{color:var(--red)}
-.stat small{display:block;font-family:var(--b);font-weight:400;font-size:16px;letter-spacing:0;
-  color:var(--dim);margin-top:11px;line-height:1.36}
+/* ============ цепочка отказов ============ */
+.chain{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:13px;min-height:0}
+.ch{background:var(--tile);border-radius:15px;padding:22px;display:flex;flex-direction:column}
+.ch.dead{background:var(--jet);color:var(--paper)}
+.ch h4{font-size:20px;font-weight:800;letter-spacing:-.018em;line-height:1.16;margin-bottom:11px}
+.ch.dead h4{color:var(--flame)}
+.ch p{font-size:16.5px;line-height:1.48;color:var(--muted)}
+.ch.dead p{color:rgba(241,236,227,.74)}
+.ch .verd{margin-top:auto;padding-top:16px;font-size:16px;font-weight:700}
+.ch.dead .verd{color:var(--flame)}
 
-/* glossary */
-.gl{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--rule-hi)}
-.gi{border-bottom:1px solid var(--rule);padding:18px 26px 18px 0;display:grid;
-    grid-template-columns:206px 1fr;gap:22px;align-items:start;position:relative}
-.gi:nth-child(even){padding-left:34px;border-left:1px solid var(--rule)}
-.gi::before{content:"";position:absolute;left:0;top:18px;width:3px;height:20px;background:var(--cyan)}
-.gi:nth-child(even)::before{left:34px}
-.gi dt{font-family:var(--d);font-weight:700;font-size:20px;color:var(--cyan);line-height:1.18;
-       padding-left:14px;letter-spacing:.008em}
-.gi:nth-child(even) dt{padding-left:14px}
-.gi dd{font-size:16.5px;line-height:1.5;color:var(--dim)}
+/* ============ воронка-горлышко ============ */
+/* воронка: конус клип-путём, горло и подписи — обычный текст */
+.fn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;min-height:0}
+.fn .cap{font-size:12px;font-weight:700;letter-spacing:.14em;color:var(--muted);margin-bottom:16px}
+.fn .cone{width:100%;height:236px;background:var(--paper-2);position:relative;flex:none;
+  clip-path:polygon(0 0,100% 0,58% 100%,42% 100%)}
+.fn .cone i{position:absolute;left:0;right:0;height:2px;background:var(--tile)}
+.fn .neck{width:16%;background:var(--flame);padding:13px 0 11px;text-align:center;flex:none}
+.fn .neck b{display:block;font-size:29px;font-weight:900;letter-spacing:-.03em;line-height:1}
+.fn .neck s{display:block;text-decoration:none;font-size:10px;font-weight:700;
+  letter-spacing:.12em;color:rgba(22,20,15,.72);margin-top:3px}
+.fn .arw{width:3px;height:34px;background:var(--flame);flex:none;position:relative}
+.fn .arw::after{content:"";position:absolute;left:50%;bottom:-11px;transform:translateX(-50%);
+  border:8px solid transparent;border-top:12px solid var(--flame)}
+.fn .out{margin-top:20px;font-size:15px;font-weight:800;letter-spacing:.06em}
 
-/* pull quote / open question */
-.pull{font-family:var(--d);font-weight:700;font-size:66px;line-height:1.09;letter-spacing:-.008em}
-.aside{font-size:18px;color:var(--dim);line-height:1.5;max-width:none}
-.aside.after{margin-top:34px;padding-top:20px;border-top:1px solid var(--rule)}
+/* ============ глоссарий ============ */
+.gl{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:11px;min-height:0}
+.gi{background:var(--tile);border-radius:13px;padding:16px 20px;display:flex;flex-direction:column;
+    justify-content:center;min-height:0}
+.gi dt{font-size:18px;font-weight:800;letter-spacing:-.018em;margin-bottom:6px}
+.gi dd{font-size:15.5px;line-height:1.44;color:var(--muted)}
 
-/* открытый вопрос: три развилки, много воздуха */
-.qsplit{display:grid;grid-template-columns:1fr 1fr 1.15fr;gap:0 40px;margin-top:46px}
-.qcase{border-top:2px solid var(--rule-hi);padding-top:16px}
-.qcase.ask{border-top-color:var(--yellow)}
-.qcase .qk{font-family:var(--d);font-weight:700;font-size:21px;color:var(--bone);margin-bottom:11px;line-height:1.18}
-.qcase.ask .qk{color:var(--yellow)}
-.qcase p{font-size:18px;line-height:1.55;color:var(--dim);max-width:38ch}
-
-/* section divider slide */
-.sec{justify-content:center}
-.sec .kick{font-family:var(--d);font-weight:500;font-size:16px;letter-spacing:.24em;color:var(--dim);margin-bottom:18px}
-.sec h2{font-size:104px;line-height:.98}
-
-.s.vc{justify-content:center}
-.note.after{margin-top:32px}
-.sp{flex:1}
 .mt{margin-top:auto}
-.note{font-size:16px;color:var(--dim-2);line-height:1.45;max-width:80ch}
+.note{font-size:16px;line-height:1.5;color:var(--muted)}
+.dark .note{color:rgba(241,236,227,.66)}
+.hot .note{color:rgba(22,20,15,.76)}
+.after{margin-top:22px}
 
-/* ============ transition: scan-wipe + channel split ============ */
-/* узкая сканирующая полоса, а не заливка во весь экран:
-   на 16 слайдах подряд широкая жёлтая вспышка утомляет */
-#wipe{position:absolute;inset:0;z-index:20;pointer-events:none;opacity:0;
-  background:linear-gradient(90deg,
-    transparent 0%,
-    rgba(252,238,10,.05) 48.6%,
-    rgba(252,238,10,.42) 50%,
-    rgba(34,224,240,.16) 51.4%,
-    transparent 100%);
-  background-size:320% 100%;background-repeat:no-repeat}
-#wipe.go{animation:scan .38s cubic-bezier(.4,0,.5,1)}
-@keyframes scan{
-  0%  {opacity:1;background-position:-60% 0}
-  100%{opacity:0;background-position:170% 0}
+/* ============ переход ============ */
+#wipe{position:absolute;inset:0;z-index:20;pointer-events:none;opacity:0;background:var(--flame)}
+#wipe.go{animation:sweep .4s cubic-bezier(.62,0,.36,1)}
+@keyframes sweep{
+  0%{opacity:1;transform:scaleX(0);transform-origin:left center}
+  48%{opacity:1;transform:scaleX(1);transform-origin:left center}
+  52%{opacity:1;transform:scaleX(1);transform-origin:right center}
+  100%{opacity:1;transform:scaleX(0);transform-origin:right center}
 }
-.s.in{animation:split .34s cubic-bezier(.2,.8,.2,1)}
-@keyframes split{
-  0%{opacity:0;transform:translateX(var(--dir,22px));filter:blur(0)}
-  26%{opacity:1;text-shadow:1.6px 0 rgba(255,51,85,.42),-1.6px 0 rgba(34,224,240,.42)}
-  100%{opacity:1;transform:none;text-shadow:none}
-}
+.s.in{animation:slidein .36s cubic-bezier(.22,.75,.2,1)}
+@keyframes slidein{0%{opacity:0;transform:translateY(var(--dy,14px))}100%{opacity:1;transform:none}}
 
-/* ============ overview ============ */
-#ov{position:fixed;inset:0;z-index:40;background:rgba(7,9,16,.975);display:none;
-  grid-template-columns:repeat(5,1fr);gap:16px;padding:40px;overflow:auto;align-content:start}
+/* ============ обзор ============ */
+#ov{position:fixed;inset:0;z-index:40;background:rgba(20,19,15,.97);display:none;
+  grid-template-columns:repeat(5,1fr);gap:14px;padding:36px;overflow:auto;align-content:start}
 #ov.on{display:grid}
-.ovc{aspect-ratio:16/9;border:1px solid var(--rule-hi);background:var(--void-2);cursor:pointer;
-  padding:13px;display:flex;flex-direction:column;justify-content:space-between;transition:border-color .18s}
-.ovc:hover,.ovc:focus-visible{border-color:var(--yellow);outline:none}
-.ovc.cur{border-color:var(--cyan)}
-.ovc .t{font-family:var(--d);font-weight:700;font-size:15px;line-height:1.14;color:var(--bone)}
-.ovc .i{font-family:var(--d);font-size:12px;color:var(--dim-2);font-variant-numeric:tabular-nums}
-.ovc.cur .i{color:var(--cyan)}
+.ovc{aspect-ratio:16/9;border-radius:11px;background:var(--paper);cursor:pointer;border:2px solid transparent;
+  padding:13px;display:flex;flex-direction:column;justify-content:space-between;text-align:left;
+  font-family:var(--f);transition:border-color .16s}
+.ovc:hover,.ovc:focus-visible{border-color:var(--flame);outline:none}
+.ovc.cur{border-color:var(--flame)}
+.ovc .t{font-size:14px;font-weight:700;line-height:1.16;color:var(--ink)}
+.ovc .i{font-size:12px;font-weight:600;color:var(--muted);font-variant-numeric:tabular-nums}
 
-/* ============ help ============ */
-#help{position:fixed;right:14px;bottom:12px;z-index:30;font-size:12px;color:#6B7490;
-  font-family:var(--d);letter-spacing:.1em;transition:opacity .5s;pointer-events:none}
+#help{position:fixed;right:14px;bottom:11px;z-index:30;font-size:11.5px;color:#5A544A;
+  font-weight:600;letter-spacing:.07em;transition:opacity .5s;pointer-events:none}
 #help.hide{opacity:0}
+:focus-visible{outline:2px solid var(--flame);outline-offset:3px}
 
-:focus-visible{outline:2px solid var(--yellow);outline-offset:3px}
-
-/* ============ reduced motion ============ */
 @media (prefers-reduced-motion:reduce){
-  #wipe.go{animation:none}
-  .s.in{animation:none}
+  #wipe.go,.s.in{animation:none}
   .s.live .r{animation:none;opacity:1;transform:none}
-  .tick i,.tick b{transition:none}
 }
 
-/* ============ print → PDF, one slide per landscape page ============ */
+/* ============ печать в PDF ============ */
 @media print{
   @page{size:1600px 900px;margin:0}
   html,body{overflow:visible;height:auto;background:#fff}
   #stage{position:static;display:block}
   #deck{position:static;left:auto;top:auto;transform:none;width:1600px;height:auto;overflow:visible}
-  #rail,#help,#ov,#wipe{display:none!important}
+  #help,#ov,#wipe{display:none!important}
   .s{position:relative;inset:auto;width:1600px;height:900px;opacity:1!important;visibility:visible!important;
-     page-break-after:always;break-after:page;background:var(--void);padding-left:110px}
+     page-break-after:always;break-after:page}
   .s:last-of-type{page-break-after:auto;break-after:auto}
   .s .r{opacity:1!important;transform:none!important;animation:none!important}
-  .meta{left:110px}
-  .s::after{left:110px}
-  #deck::before{display:none}
 }
 </style>
 </head>
 <body>
 
 <div id="stage">
-  <div id="deck">
-    <!--SPRITE-->
-    <div id="wipe"></div>
-
-    <nav id="rail" aria-label="Уровни карты">
-      <span class="cap t">ГЕЙМДЕВ</span>
-      <div class="rl"></div>
-      <span class="cap b">ИГРОК</span>
-    </nav>
-
-<!--SLIDES-->
-
-  </div>
+  <div id="deck"><!--SPRITE--><div id="wipe"></div><!--SLIDES--></div>
 </div>
 
 <div id="ov" role="dialog" aria-label="Все слайды" aria-modal="true"></div>
@@ -306,68 +277,39 @@ li.r_::before{background:var(--red)}
   'use strict';
   var deck=document.getElementById('deck');
   var slides=[].slice.call(deck.querySelectorAll('.s'));
-  var rail=document.getElementById('rail');
   var wipe=document.getElementById('wipe');
   var ov=document.getElementById('ov');
   var help=document.getElementById('help');
   var cur=0, total=slides.length;
-  var NECK=8; // floor 8 is the bottleneck
   var reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
 
-  /* ---- build the layer gauge: 8 floors ---- */
-  var railTop=118, railBot=96, ticks=[];
-  (function(){
-    var span=900-railTop-railBot;
-    for(var f=1;f<=8;f++){
-      var t=document.createElement('div');
-      t.className='tick';
-      if(f===NECK) t.setAttribute('data-neck','');
-      t.style.top=(railTop+(f-1)*(span/7)-11)+'px';
-      t.innerHTML='<i></i><b>'+f+'</b>';
-      rail.appendChild(t); ticks.push(t);
-    }
-  })();
-
-  /* ---- scale the 16:9 stage to the viewport ---- */
   function fit(){
-    var s=Math.min(window.innerWidth/1600, window.innerHeight/900);
-    deck.style.setProperty('--s', s);
+    deck.style.setProperty('--s', Math.min(window.innerWidth/1600, window.innerHeight/900));
   }
   window.addEventListener('resize',fit,{passive:true}); fit();
 
-  /* ---- navigate ---- */
   function show(n,dir){
     n=Math.max(0,Math.min(total-1,n));
     if(n===cur && slides[cur].classList.contains('live')) return;
-    var prev=cur; cur=n;
-
-    slides[prev].classList.remove('live','in');
+    slides[cur].classList.remove('live','in');
+    cur=n;
     var el=slides[cur];
     el.classList.add('live');
-
     if(!reduce){
-      el.style.setProperty('--dir',(dir<0?-22:22)+'px');
-      void el.offsetWidth;              // restart the entry animation
-      el.classList.add('in');
+      el.style.setProperty('--dy',(dir<0?-14:14)+'px');
+      void el.offsetWidth; el.classList.add('in');
       wipe.classList.remove('go'); void wipe.offsetWidth; wipe.classList.add('go');
     }
-
-    // restart the staggered reveal inside the slide
-    var rs=el.querySelectorAll('.r');
-    for(var i=0;i<rs.length;i++){ rs[i].style.animation='none'; }
+    var rs=el.querySelectorAll('.r'), i;
+    for(i=0;i<rs.length;i++) rs[i].style.animation='none';
     void el.offsetWidth;
-    for(var j=0;j<rs.length;j++){ rs[j].style.animation=''; }
-
-    var floor=parseInt(el.getAttribute('data-floor')||'0',10);
-    for(var k=0;k<ticks.length;k++) ticks[k].classList.toggle('on', k+1===floor);
-
+    for(i=0;i<rs.length;i++) rs[i].style.animation='';
     if(ov.classList.contains('on')) syncOv();
     try{ history.replaceState(null,'','#'+(cur+1)); }catch(e){}
   }
-  var next=function(){ show(cur+1, 1); };
+  var next=function(){ show(cur+1,1); };
   var prev=function(){ show(cur-1,-1); };
 
-  /* ---- overview ---- */
   function buildOv(){
     ov.innerHTML='';
     slides.forEach(function(s,i){
@@ -379,17 +321,13 @@ li.r_::before{background:var(--red)}
       ov.appendChild(b);
     });
   }
-  function syncOv(){
-    var cs=ov.children;
-    for(var i=0;i<cs.length;i++) cs[i].classList.toggle('cur', i===cur);
-  }
+  function syncOv(){ for(var i=0;i<ov.children.length;i++) ov.children[i].classList.toggle('cur', i===cur); }
   function toggleOv(on){
-    var want = (on===undefined) ? !ov.classList.contains('on') : on;
-    ov.classList.toggle('on', want);
+    var want=(on===undefined)?!ov.classList.contains('on'):on;
+    ov.classList.toggle('on',want);
     if(want){ buildOv(); var c=ov.querySelector('.cur'); if(c) c.focus(); }
   }
 
-  /* ---- keys ---- */
   document.addEventListener('keydown',function(e){
     if(e.metaKey||e.ctrlKey||e.altKey) return;
     var k=e.key;
@@ -406,7 +344,6 @@ li.r_::before{background:var(--red)}
       if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }
   });
 
-  /* ---- click / swipe ---- */
   document.getElementById('stage').addEventListener('click',function(e){
     if(ov.classList.contains('on')) return;
     (e.clientX < window.innerWidth*0.24) ? prev() : next();
@@ -418,15 +355,12 @@ li.r_::before{background:var(--red)}
     if(Math.abs(dx)>52 && Math.abs(dx)>Math.abs(dy)) (dx<0?next:prev)();
   },{passive:true});
 
-  /* ---- fade the hint away ---- */
   setTimeout(function(){ help.classList.add('hide'); },5200);
 
-  /* ---- boot ---- */
-  // номер проставляем каждому слайду свой: при печати в PDF на странице
-  // видна её собственная нумерация, а не номер активного слайда
+  // свой номер на каждом слайде — иначе в PDF на всех страницах стоит номер активного
   slides.forEach(function(s,i){
-    var m=s.querySelector('.meta .num');
-    if(m) m.innerHTML='<em>'+String(i+1).padStart(2,'0')+'</em> / '+String(total).padStart(2,'0');
+    var m=s.querySelector('.cnt');
+    if(m) m.textContent=String(i+1).padStart(2,'0')+' / '+String(total).padStart(2,'0');
   });
   var start=parseInt((location.hash||'#1').slice(1),10);
   show(isNaN(start)?0:start-1, 1);
