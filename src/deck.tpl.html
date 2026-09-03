@@ -9,16 +9,16 @@
 
 /* ============ tokens ============ */
 :root{
-  --void:#0B0A07;          /* warm black ground */
-  --void-2:#131109;
-  --rule:#2A2618;
-  --rule-hi:#3D3722;
-  --yellow:#FCEE0A;        /* RESERVED: объект конкуренции */
-  --cyan:#14E3F0;          /* structure: уровни, карта */
-  --red:#FF2E4D;           /* RESERVED: горлышко / отказ */
-  --bone:#EDE8D8;
-  --dim:#8A8268;
-  --dim-2:#5E5844;
+  --void:#0A0C14;          /* ночной сине-чёрный, не бурый */
+  --void-2:#111524;
+  --rule:#1E2436;
+  --rule-hi:#2E3750;
+  --yellow:#FCEE0A;        /* RESERVED: объект конкуренции — 16:1 к фону */
+  --cyan:#22E0F0;          /* структура: уровни, карта — 12:1 */
+  --red:#FF3355;           /* RESERVED: горлышко / отказ — 5.5:1 */
+  --bone:#F2EFE6;          /* основной текст — 17:1 */
+  --dim:#AEB4C4;           /* вторичный текст — 9.3:1, было 2.6:1 */
+  --dim-2:#7A8299;         /* метаданные — 5.1:1 */
 
   --d:'Oswald', 'Arial Narrow', 'Haettenschweiler', sans-serif;
   --b:'Geologica', 'Segoe UI', system-ui, -apple-system, sans-serif;
@@ -30,6 +30,8 @@ body{font-family:var(--b);color:var(--bone);-webkit-font-smoothing:antialiased}
 
 /* ============ 16:9 stage ============ */
 #stage{position:fixed;inset:0;overflow:hidden;background:var(--void)}
+#deck::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;
+  background:radial-gradient(120% 85% at 50% 0%,rgba(52,66,110,.28),rgba(10,12,20,0) 62%)}
 /* absolute centring: a scaled box larger than the viewport must not rely on
    layout alignment, or it overflows to one side and gets clipped */
 #deck{
@@ -43,19 +45,19 @@ body{font-family:var(--b);color:var(--bone);-webkit-font-smoothing:antialiased}
   content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
   background-image:linear-gradient(var(--rule) 1px,transparent 1px),
                    linear-gradient(90deg,var(--rule) 1px,transparent 1px);
-  background-size:100px 100px;opacity:.20;
+  background-size:100px 100px;opacity:.55;
 }
 
 /* ============ persistent layer gauge (left rail) ============ */
-#rail{position:absolute;left:0;top:0;bottom:0;width:86px;z-index:6;
-  border-right:1px solid var(--rule-hi);background:linear-gradient(180deg,#100E09,#0B0A07)}
+#rail{position:absolute;left:0;top:0;bottom:0;width:86px;z-index:7;
+  border-right:1px solid var(--rule-hi);background:linear-gradient(180deg,#0F1422,#0A0C14)}
 #rail .rl{position:absolute;left:31px;top:118px;bottom:96px;width:1px;background:var(--rule-hi)}
 .tick{position:absolute;left:0;width:86px;height:22px;display:flex;align-items:center;gap:9px;padding-left:18px;
   transition:opacity .3s ease}
 .tick i{display:block;width:27px;height:2px;background:var(--dim-2);flex:none;transition:all .35s cubic-bezier(.2,.8,.2,1)}
 .tick b{font-family:var(--d);font-weight:500;font-size:14px;color:var(--dim-2);line-height:1;
   font-variant-numeric:tabular-nums;transition:color .35s ease}
-.tick[data-neck] i{background:#5A2230}
+.tick[data-neck] i{background:#6B2437}
 .tick.on i{background:var(--cyan);width:44px;box-shadow:0 0 14px rgba(20,227,240,.55)}
 .tick.on b{color:var(--cyan)}
 .tick.on[data-neck] i{background:var(--red);box-shadow:0 0 14px rgba(255,46,77,.6)}
@@ -66,7 +68,7 @@ body{font-family:var(--b);color:var(--bone);-webkit-font-smoothing:antialiased}
 #rail .cap.b{bottom:30px}
 
 /* ============ slide chrome ============ */
-.s{position:absolute;inset:0;z-index:2;padding:64px 88px 76px 150px;
+.s{position:absolute;inset:0;z-index:3;padding:64px 88px 76px 150px;
   opacity:0;visibility:hidden;pointer-events:none;display:flex;flex-direction:column}
 .s.live{opacity:1;visibility:visible;pointer-events:auto}
 
@@ -110,7 +112,7 @@ strong{font-weight:600;color:#fff}
 .row .n{font-family:var(--d);font-weight:500;font-size:15px;color:var(--dim-2);font-variant-numeric:tabular-nums}
 .row .lvl{font-family:var(--d);font-weight:700;font-size:23px;letter-spacing:.012em;color:var(--bone);line-height:1.1}
 .row .obj{font-size:19px;line-height:1.25;color:var(--yellow);font-weight:400}
-.row .who{font-size:15px;line-height:1.3;color:var(--dim);text-align:right}
+.row .who{font-size:15px;line-height:1.34;color:var(--dim);text-align:right}
 .row.neck{background:linear-gradient(90deg,rgba(255,46,77,.13),rgba(255,46,77,0) 76%)}
 .row.neck .lvl{color:var(--red)}
 .row.neck .n{color:var(--red)}
@@ -118,6 +120,16 @@ strong{font-weight:600;color:#fff}
 .maphead{display:grid;grid-template-columns:30px 300px 1fr 290px;gap:0 22px;padding-bottom:9px;
   font-family:var(--d);font-weight:500;font-size:12.5px;letter-spacing:.16em;color:var(--dim-2)}
 .maphead .r3{text-align:right}
+
+/* ============ логотипы ============ */
+.lg{display:inline-flex;align-items:center;gap:11px;flex-wrap:wrap}
+.lg svg{width:27px;height:27px;fill:currentColor;flex:none;opacity:.95}
+.lg.big svg{width:34px;height:34px}
+.lg.sm svg{width:18px;height:18px}
+.row .who .lg{justify-content:flex-end;gap:13px;color:var(--bone);margin-bottom:6px}
+.row .who .fig{display:block;font-size:13.5px;color:var(--dim-2);line-height:1.3}
+.row.neck .who .lg{color:var(--red)}
+.nologo{font-size:13.5px;color:var(--dim-2);line-height:1.4;font-style:italic;display:block;max-width:280px;margin-left:auto}
 
 /* ============ generic blocks ============ */
 .cols{display:grid;gap:30px;margin-top:28px}
@@ -128,7 +140,7 @@ strong{font-weight:600;color:#fff}
 .blk.c{border-top-color:var(--cyan)}
 .blk.r_{border-top-color:var(--red)}
 .blk h4{font-family:var(--d);font-weight:700;font-size:22px;line-height:1.14;margin-bottom:9px;color:var(--bone)}
-.blk p{font-size:17.5px;line-height:1.46;color:var(--dim)}
+.blk p{font-size:17.5px;line-height:1.5;color:var(--dim)}
 .blk p + p{margin-top:9px}
 
 ul{list-style:none}
@@ -141,7 +153,7 @@ li.r_::before{background:var(--red)}
 .balist{flex:1;display:flex;flex-direction:column;border-top:1px solid var(--rule-hi)}
 .ba{flex:1;display:grid;grid-template-columns:1fr 46px 1fr;align-items:center;gap:0 16px;
   border-bottom:1px solid var(--rule);padding:13px 0}
-.ba .was{font-size:18.5px;color:var(--dim-2);text-decoration:line-through;text-decoration-color:#4A4433}
+.ba .was{font-size:18.5px;color:var(--dim-2);text-decoration:line-through;text-decoration-color:#4E5670}
 .ba .arw{color:var(--dim-2);text-align:center;font-size:19px}
 .ba .now{font-size:19.5px;color:var(--bone)}
 .ba .now em{font-style:normal;color:var(--yellow)}
@@ -166,14 +178,29 @@ li.r_::before{background:var(--red)}
   color:var(--dim);margin-top:11px;line-height:1.36}
 
 /* glossary */
-.gl{display:grid;grid-template-columns:1fr 1fr;gap:0 56px}
-.gi{border-bottom:1px solid var(--rule);padding:17px 0;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:baseline}
-.gi dt{font-family:var(--d);font-weight:700;font-size:21px;color:var(--cyan);white-space:nowrap;line-height:1.16}
-.gi dd{font-size:16.5px;line-height:1.4;color:var(--dim)}
+.gl{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--rule-hi)}
+.gi{border-bottom:1px solid var(--rule);padding:18px 26px 18px 0;display:grid;
+    grid-template-columns:206px 1fr;gap:22px;align-items:start;position:relative}
+.gi:nth-child(even){padding-left:34px;border-left:1px solid var(--rule)}
+.gi::before{content:"";position:absolute;left:0;top:18px;width:3px;height:20px;background:var(--cyan)}
+.gi:nth-child(even)::before{left:34px}
+.gi dt{font-family:var(--d);font-weight:700;font-size:20px;color:var(--cyan);line-height:1.18;
+       padding-left:14px;letter-spacing:.008em}
+.gi:nth-child(even) dt{padding-left:14px}
+.gi dd{font-size:16.5px;line-height:1.5;color:var(--dim)}
 
 /* pull quote / open question */
-.pull{font-family:var(--d);font-weight:700;font-size:66px;line-height:1.09;letter-spacing:-.008em;max-width:22ch}
-.aside{font-size:18px;color:var(--dim);line-height:1.5;max-width:62ch}
+.pull{font-family:var(--d);font-weight:700;font-size:66px;line-height:1.09;letter-spacing:-.008em}
+.aside{font-size:18px;color:var(--dim);line-height:1.5;max-width:none}
+.aside.after{margin-top:34px;padding-top:20px;border-top:1px solid var(--rule)}
+
+/* открытый вопрос: три развилки, много воздуха */
+.qsplit{display:grid;grid-template-columns:1fr 1fr 1.15fr;gap:0 40px;margin-top:46px}
+.qcase{border-top:2px solid var(--rule-hi);padding-top:16px}
+.qcase.ask{border-top-color:var(--yellow)}
+.qcase .qk{font-family:var(--d);font-weight:700;font-size:21px;color:var(--bone);margin-bottom:11px;line-height:1.18}
+.qcase.ask .qk{color:var(--yellow)}
+.qcase p{font-size:18px;line-height:1.55;color:var(--dim);max-width:38ch}
 
 /* section divider slide */
 .sec{justify-content:center}
@@ -187,23 +214,30 @@ li.r_::before{background:var(--red)}
 .note{font-size:16px;color:var(--dim-2);line-height:1.45;max-width:80ch}
 
 /* ============ transition: scan-wipe + channel split ============ */
-#wipe{position:absolute;inset:0;z-index:20;pointer-events:none;opacity:0}
-#wipe.go{animation:scan .42s linear}
+/* узкая сканирующая полоса, а не заливка во весь экран:
+   на 16 слайдах подряд широкая жёлтая вспышка утомляет */
+#wipe{position:absolute;inset:0;z-index:20;pointer-events:none;opacity:0;
+  background:linear-gradient(90deg,
+    transparent 0%,
+    rgba(252,238,10,.05) 48.6%,
+    rgba(252,238,10,.42) 50%,
+    rgba(34,224,240,.16) 51.4%,
+    transparent 100%);
+  background-size:320% 100%;background-repeat:no-repeat}
+#wipe.go{animation:scan .38s cubic-bezier(.4,0,.5,1)}
 @keyframes scan{
-  0%{opacity:1;background:linear-gradient(90deg,transparent 0%,rgba(252,238,10,.10) 44%,rgba(252,238,10,.85) 50%,rgba(20,227,240,.30) 56%,transparent 100%);
-     background-size:260% 100%;background-position:-80% 0}
-  100%{opacity:1;background:linear-gradient(90deg,transparent 0%,rgba(252,238,10,.10) 44%,rgba(252,238,10,.85) 50%,rgba(20,227,240,.30) 56%,transparent 100%);
-     background-size:260% 100%;background-position:180% 0}
+  0%  {opacity:1;background-position:-60% 0}
+  100%{opacity:0;background-position:170% 0}
 }
 .s.in{animation:split .34s cubic-bezier(.2,.8,.2,1)}
 @keyframes split{
   0%{opacity:0;transform:translateX(var(--dir,22px));filter:blur(0)}
-  28%{opacity:1;text-shadow:2.5px 0 rgba(255,46,77,.65),-2.5px 0 rgba(20,227,240,.65)}
+  26%{opacity:1;text-shadow:1.6px 0 rgba(255,51,85,.42),-1.6px 0 rgba(34,224,240,.42)}
   100%{opacity:1;transform:none;text-shadow:none}
 }
 
 /* ============ overview ============ */
-#ov{position:fixed;inset:0;z-index:40;background:rgba(6,6,4,.97);display:none;
+#ov{position:fixed;inset:0;z-index:40;background:rgba(7,9,16,.975);display:none;
   grid-template-columns:repeat(5,1fr);gap:16px;padding:40px;overflow:auto;align-content:start}
 #ov.on{display:grid}
 .ovc{aspect-ratio:16/9;border:1px solid var(--rule-hi);background:var(--void-2);cursor:pointer;
@@ -215,7 +249,7 @@ li.r_::before{background:var(--red)}
 .ovc.cur .i{color:var(--cyan)}
 
 /* ============ help ============ */
-#help{position:fixed;right:14px;bottom:12px;z-index:30;font-size:12px;color:#4A4433;
+#help{position:fixed;right:14px;bottom:12px;z-index:30;font-size:12px;color:#6B7490;
   font-family:var(--d);letter-spacing:.1em;transition:opacity .5s;pointer-events:none}
 #help.hide{opacity:0}
 
@@ -250,6 +284,7 @@ li.r_::before{background:var(--red)}
 
 <div id="stage">
   <div id="deck">
+    <!--SPRITE-->
     <div id="wipe"></div>
 
     <nav id="rail" aria-label="Уровни карты">
@@ -326,7 +361,6 @@ li.r_::before{background:var(--red)}
     var floor=parseInt(el.getAttribute('data-floor')||'0',10);
     for(var k=0;k<ticks.length;k++) ticks[k].classList.toggle('on', k+1===floor);
 
-    var c=el.querySelector('.num em'); if(c) c.textContent=String(cur+1).padStart(2,'0');
     if(ov.classList.contains('on')) syncOv();
     try{ history.replaceState(null,'','#'+(cur+1)); }catch(e){}
   }
@@ -388,9 +422,11 @@ li.r_::before{background:var(--red)}
   setTimeout(function(){ help.classList.add('hide'); },5200);
 
   /* ---- boot ---- */
-  slides.forEach(function(s){
+  // номер проставляем каждому слайду свой: при печати в PDF на странице
+  // видна её собственная нумерация, а не номер активного слайда
+  slides.forEach(function(s,i){
     var m=s.querySelector('.meta .num');
-    if(m) m.innerHTML='<em>01</em> / '+String(total).padStart(2,'0');
+    if(m) m.innerHTML='<em>'+String(i+1).padStart(2,'0')+'</em> / '+String(total).padStart(2,'0');
   });
   var start=parseInt((location.hash||'#1').slice(1),10);
   show(isNaN(start)?0:start-1, 1);

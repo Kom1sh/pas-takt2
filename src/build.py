@@ -15,9 +15,11 @@ SRC = ROOT / "src"
 tpl = (SRC / "deck.tpl.html").read_text(encoding="utf-8")
 fonts = (SRC / "fonts.css").read_text(encoding="utf-8")
 slides = (SRC / "slides.html").read_text(encoding="utf-8")
+sprite = (SRC / "sprite.html").read_text(encoding="utf-8")
 
-if "/*FONTS*/" not in tpl or "<!--SLIDES-->" not in tpl:
-    raise SystemExit("в шаблоне нет якорей /*FONTS*/ и <!--SLIDES-->")
+for anchor in ("/*FONTS*/", "<!--SPRITE-->", "<!--SLIDES-->"):
+    if anchor not in tpl:
+        raise SystemExit(f"в шаблоне нет якоря {anchor}")
 
 # Пробельные текстовые узлы между секциями в @media print порождают
 # анонимные строчные боксы и выплёвывают лишнюю пустую страницу в PDF.
@@ -25,7 +27,9 @@ slides = re.sub(r">\s*\n\s*<!--[^>]*?-->\s*\n\s*<section", "><section", slides)
 slides = re.sub(r"</section>\s+<section", "</section><section", slides)
 slides = slides.strip()
 
-out = tpl.replace("/*FONTS*/", fonts).replace("<!--SLIDES-->", slides)
+out = (tpl.replace("/*FONTS*/", fonts)
+          .replace("<!--SPRITE-->", sprite)
+          .replace("<!--SLIDES-->", slides))
 out = re.sub(r"</section>\s+</div>", "</section></div>", out)
 out = re.sub(r'<div id="wipe"></div>\s+<nav', '<div id="wipe"></div><nav', out)
 out = re.sub(r"</nav>\s+<section", "</nav><section", out)
