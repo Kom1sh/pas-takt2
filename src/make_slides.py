@@ -17,7 +17,7 @@ BRAND = {
     "apple": INK, "android": "#34A853", "ubisoft": INK, "ea": INK, "sony": INK,
     "riotgames": "#EB0029", "rockstargames": "#FCAF17", "cdprojekt": "#DC0D15",
     "valve": "#F74843", "vk": "#0077FF", "nvidia": "#76B900", "amd": "#ED1C24",
-    "intel": "#0071C5",
+    "intel": "#0071C5", "sega": "#0089CF", "squareenix": "#ED1C24",
 }
 NAME = {
     "unity": "Unity", "unrealengine": "Unreal", "godotengine": "Godot", "steam": "Steam",
@@ -27,6 +27,7 @@ NAME = {
     "apple": "iOS", "android": "Android", "ubisoft": "Ubisoft", "ea": "EA", "sony": "Sony",
     "riotgames": "Riot Games", "rockstargames": "Rockstar", "cdprojekt": "CD Projekt",
     "valve": "Valve", "vk": "VK Play", "nvidia": "NVIDIA", "amd": "AMD", "intel": "Intel",
+    "sega": "Sega", "squareenix": "Square Enix",
 }
 
 
@@ -46,8 +47,8 @@ UI = {
 
 
 def ui(name, big=False):
-    return ('<svg class="ui%s" viewBox="0 0 24 24" aria-hidden="true">%s</svg>'
-            % (" big" if big else "", UI[name]))
+    return ('<div class="badge"><svg class="ui" viewBox="0 0 24 24" aria-hidden="true">%s</svg></div>'
+            % UI[name])
 
 
 def ico(slug, size=None):
@@ -118,21 +119,21 @@ S.append(('Карта уровней', '', top("Схема · разметка �
   <div class="maphead"><span></span><span>Уровень</span><span>Объект конкуренции</span><span>Кто стоит</span></div>
   <div class="map">'''
   + row("01", "Интеллектуальная<br>собственность", "Право делать этот мир и этих героев",
-        ["nintendo", "cdprojekt"], "Disney,<br>R.&nbsp;Talsorian")
+        ["nintendo", "sega", "cdprojekt"], "")
   + row("02", "Концепт", "Снижение риска до вложений",
-        ["valve", "rockstargames"], "внутренние<br>R&amp;D")
+        ["valve", "rockstargames"], "")
   + row("03", "Движки<br>и инструменты", "Производственный стандарт",
-        ["unrealengine", "unity", "godotengine"], "42% · 30%<br>· 11%")
+        ["unrealengine", "unity", "godotengine"], "")
   + row("04", "Компоненты<br>и аутсорс", "Опыт, обменянный на срок и цену",
-        [], "сотни студий,<br>ни одного знака")
+        [], "")
   + row("05", "Разработка", "Игровой опыт",
-        ["cdprojekt", "rockstargames", "riotgames"], "Insomniac,<br>Valve")
+        ["cdprojekt", "rockstargames", "riotgames", "valve"], "")
   + row("06", "Издание<br>и маркетинг", "Деньги и право на релиз",
-        ["sony", "ubisoft", "ea"], "Tencent,<br>Take-Two")
+        ["sony", "ubisoft", "ea", "squareenix"], "")
   + row("07", "Платформы<br>и железо", "Доступность",
         ["playstation", "xbox", "nintendoswitch", "apple", "android"], "")
   + row("08", "Витрины<br>и дистрибуция", "Внимание и привычка игрока",
-        ["steam", "epicgames", "gogdotcom", "appstore"], "Steam — 75%<br>выручки PC", neck=True)
+        ["steam", "epicgames", "gogdotcom", "appstore"], "", neck=True)
   + '</div>'))
 
 # ── 05 этаж 01 ───────────────────────────────────────────────────────────
@@ -146,7 +147,7 @@ S.append(('01 · Интеллектуальная собственность', '
       <h4>Живёт десятилетиями</h4>
       <p>Mario 1985 года всё ещё закрывает этаж. Барьер входа не денежный, а юридический.</p></div>
     <div class="card sage">
-      <div style="display:flex;gap:20px;margin-bottom:18px">''' + ico("cdprojekt", 58) + ico("nintendo", 58) + '''</div>
+      <div class="logos">''' + ico("cdprojekt", 58) + ico("nintendo", 58) + '''</div>
       <h4>Cyberpunk начинается здесь</h4>
       <p>CD&nbsp;Projekt не придумала Найт-Сити — взяла права у Майка Пондсмита.</p></div>
   </div>
@@ -179,7 +180,7 @@ S.append(('04 · Компоненты и аутсорс', '', top("Этаж 04 �
       <h4>Отдают артефакты,<br>а не «работу»</h4>
       <p>Cyberpunk собран из компонентов: механики, лицевая анимация, звук, QA — всё разными командами.</p></div>
     <div class="card dark">
-      <div style="margin-bottom:18px">''' + ico("rockstargames", 58) + '''</div>
+      <div class="logos">''' + ico("rockstargames", 58) + '''</div>
       <h4>Контрмодель: Rockstar</h4>
       <p>Свои студии и свой движок RAGE. Внешнего арт-аутсорса почти нет — ценой закрытости.</p></div>
   </div>
@@ -191,11 +192,11 @@ S.append(('05 · Кто делает игру', '', top("Этаж 05 · разр
   <p class="lede mut r" style="--i:1;margin-top:16px;max-width:82ch">Игру сделала Insomniac&nbsp;Games — тогда независимая студия. Sony была только издателем и купила её лишь через год, в 2019-м, за $229&nbsp;млн.</p>
   <div class="cards c3 r" style="--i:2;margin-top:26px">
     <div class="card"><div class="kn">Разработчик</div>
-      <div style="display:flex;gap:18px;margin-bottom:18px">''' + ico("cdprojekt", 50) + ico("rockstargames", 50) + ico("riotgames", 50) + '''</div>
+      <div class="logos">''' + ico("cdprojekt", 50) + ico("rockstargames", 50) + ico("riotgames", 50) + '''</div>
       <h4>Игровой опыт</h4>
       <p>Дерётся за то, что игрок почувствует.</p></div>
     <div class="card"><div class="kn">Издатель</div>
-      <div style="display:flex;gap:18px;margin-bottom:18px">''' + ico("sony", 50) + ico("ubisoft", 50) + ico("ea", 50) + '''</div>
+      <div class="logos">''' + ico("sony", 50) + ico("ubisoft", 50) + ico("ea", 50) + '''</div>
       <h4>Деньги и право на релиз</h4>
       <p>Про ощущения игрока — вообще не он.</p></div>
     <div class="card dark"><div class="kn">Холдинг</div>
@@ -209,18 +210,19 @@ def grp(cap, tiles, cols, hot=False):
             'style="grid-template-columns:repeat(%d,1fr)">%s</div></div>'
             % (" hot" if hot else "", cap, cols, "".join(tiles)))
 
-S.append(('Valve на трёх этажах', '', top("Кто стоит на карте") + '''
-  <h2 class="r" style="--i:0;font-size:54px;margin-bottom:22px">Valve стоит на трёх этажах сразу —<br>поэтому этажи параллельны</h2>
+S.append(('Мало игроков — ещё не горлышко', '', top("Кто стоит на карте") + '''
+  <h2 class="r" style="--i:0;margin-bottom:22px">Мало игроков — ещё не горлышко.<br>Горлышко — когда их мало и заменить нельзя</h2>
   <div class="wall r" style="--i:1;grid-template-rows:repeat(2,1fr);grid-template-columns:1fr 1fr">'''
-  + grp("03 · Движки", [tile("unrealengine"), tile("unity"), tile("godotengine"),
-                        tile("valve", mark=True, name="Valve · Source")], 4)
-  + grp("05 · Разработка", [tile("cdprojekt"), tile("rockstargames"), tile("riotgames"),
-                            tile("valve", mark=True, name="Valve · Half-Life")], 4)
-  + grp("06 · Издание", [tile("sony"), tile("ubisoft"), tile("ea"), tile("nintendo")], 4)
-  + grp("08 · Витрины — горлышко", [tile("steam", mark=True, name="Valve · Steam"),
-        tile("epicgames"), tile("gogdotcom"), tile("appstore")], 4, hot=True)
+  + grp("03 · Движки · <b>три</b> закрывают 83% рынка · <em>заменяемы</em>",
+        [tile("unrealengine"), tile("unity"), tile("godotengine"), tile("valve", name="Valve · Source")], 4)
+  + grp("05 · Разработка · <b>тысячи</b> студий · <em>заменяемы</em>",
+        [tile("cdprojekt"), tile("rockstargames"), tile("riotgames"), tile("valve")], 4)
+  + grp("06 · Издание · <b>десятки</b> · <em>заменяемы, но дорого</em>",
+        [tile("sony"), tile("ubisoft"), tile("ea"), tile("squareenix")], 4)
+  + grp("08 · Витрины · <b>шесть</b> на весь мир · <em>не заменяемы</em>",
+        [tile("steam", mark=True), tile("epicgames", mark=True), tile("gogdotcom", mark=True), tile("appstore", mark=True)], 4, hot=True)
   + '''</div>
-  <p class="note after r" style="--i:2">Движок Source, Half-Life и Steam — одна компания на трёх разных объектах конкуренции.</p>'''))
+  <p class="note after r" style="--i:2">Движков тоже мало — но с Quake можно уйти на GoldSrc. С витрины уйти некуда: без неё игры для игрока нет.</p>'''))
 
 # ── 10 соседние этажи ────────────────────────────────────────────────────
 S.append(('Соседние этажи не совпадают', '', top("Проверка · объекты различаются") + '''
@@ -290,10 +292,10 @@ S.append(('Горлышко — витрина как класс', 'dark', top("
     <div class="fig"><div class="n">8–10%</div><div class="l">у Epic, который раздаёт игры бесплатно не первый год</div></div>
   </div>
   <div class="cards c2 r" style="--i:2;margin-top:40px">
-    <div class="card dark" style="background:rgba(241,236,227,.08)">
+    <div class="card dark mid" style="background:rgba(241,236,227,.08)">
       <h4>Что мешает войти</h4>
       <p>Купленная библиотека не переносится. Уйти — значит бросить всё, за что заплачено.</p></div>
-    <div class="card dark" style="background:rgba(241,236,227,.08)">
+    <div class="card dark mid" style="background:rgba(241,236,227,.08)">
       <h4>Честный контраргумент</h4>
       <p>Steam — только PC. Поэтому горлышко не компания, а <b>уровень</b>: в каждой экосистеме своя витрина.</p></div>
   </div>'''))
@@ -313,7 +315,7 @@ CASES = [
 S.append(('Когда витрина выключила игру', '', top("Горлышко · проверенные случаи") + '''
   <h2 class="r" style="--i:0;margin-bottom:22px">Три раза, когда витрина просто<br>выключила готовую игру</h2>
   <div class="cards c3 r" style="--i:1">'''
-  + "".join('<div class="card"><div style="margin-bottom:20px">%s</div>'
+  + "".join('<div class="card"><div class="logos">%s</div>'
             '<h4>%s</h4><div class="kn" style="margin:-6px 0 14px">%s</div>'
             '<p>%s</p><p style="margin-top:auto;padding-top:16px;color:var(--ink);font-weight:700">%s</p></div>'
             % (ico(s, 70), t, sub, b, k) for s, t, sub, b, k in CASES)

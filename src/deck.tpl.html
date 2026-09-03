@@ -123,12 +123,21 @@ b{font-weight:700}
 .tile.wide svg{width:34px;height:34px}
 .tile.wide .nmb{text-align:left;font-size:14.5px;color:var(--ink);font-weight:700}
 .wallgrp{display:flex;flex-direction:column;gap:12px;min-height:0}
-.wallgrp .cap{font-size:15px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);flex:none}
+.wallgrp .cap{font-size:17px;font-weight:600;letter-spacing:.02em;color:var(--ink);flex:none;line-height:1.3}
+.wallgrp .cap b{font-weight:900}
+.wallgrp .cap em{font-style:normal;color:var(--flame-ink);font-weight:700}
+.wallgrp.hot .cap em{color:var(--ink)}
 .wallgrp .grid{display:grid;gap:9px;flex:1;min-height:0}
 
 /* ============ смысловые иконки ============ */
-.ui{width:78px;height:78px;flex:none;stroke:var(--flame);stroke-width:1.9;fill:none;
-    stroke-linecap:round;stroke-linejoin:round;margin-bottom:22px}
+/* иконка — иллюстрация в круглом бейдже, а не буллит */
+.badge{width:176px;height:176px;border-radius:50%;background:var(--paper-2);display:grid;
+    place-items:center;flex:none}
+.card.dark .badge{background:rgba(241,236,227,.1)}
+.card.sage .badge{background:rgba(255,255,255,.72)}
+.card.hot .badge{background:rgba(22,20,15,.12)}
+.ui{width:98px;height:98px;flex:none;stroke:var(--flame);stroke-width:1.5;fill:none;
+    stroke-linecap:round;stroke-linejoin:round}
 .card.dark .ui{stroke:var(--flame)}
 .card.hot .ui{stroke:var(--ink)}
 .ui.big{width:76px;height:76px;stroke-width:1.9}
@@ -154,10 +163,18 @@ b{font-weight:700}
 .cards{display:grid;gap:15px}
 /* только прямой потомок слайда растёт: вложенные сетки остаются по контенту */
 .s > .cards{flex:1;min-height:0}
-/* контент центрируется по вертикали: короткий текст в высокой карточке
-   иначе прижимается к верху и низ выглядит пустым.
-   margin-top:auto внутри карточки по-прежнему перебивает центрирование */
-.s > .cards > .card{min-height:0;justify-content:center}
+/* карточки не растягиваются на всю высоту: короткий текст в высокой карточке
+   оставлял пустоты сверху и снизу. Ряд карточек центрируется в кадре целиком */
+.s > .cards{align-items:stretch}
+.s > .cards > .card{min-height:0}
+/* якорь карточки (иконка, метка, ряд логотипов) держится сверху, текст уходит вниз —
+   карточка заполняет ряд без пустот посередине */
+.card > .badge,.card > .kn,.card > .logos{margin-bottom:auto}
+.card.mid{justify-content:center}
+.card.mid > .badge,.card.mid > .kn,.card.mid > .logos{margin-bottom:22px}
+.logos{display:flex;gap:18px;flex-wrap:wrap}
+.logos .ic{width:64px!important;height:64px!important}
+.s > h2{margin-bottom:28px}
 .vs{justify-content:center}
 .c2{grid-template-columns:1fr 1fr}
 .c3{grid-template-columns:repeat(3,1fr)}
