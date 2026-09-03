@@ -58,6 +58,10 @@ def ico(slug, size=None):
     return '<svg class="ic" style="%s"><use href="#i-%s"/></svg>' % (st, slug)
 
 
+def brand(slug):
+    return '<div class="badge">' + ico(slug) + '</div>'
+
+
 def tile(slug, wide=False, mark=False, name=None):
     cls = ("tile" + (" wide" if wide else "") + (" mark" if mark else ""))
     return ('<div class="%s">%s<span class="nmb">%s</span></div>'
@@ -143,11 +147,10 @@ S.append(('01 · Интеллектуальная собственность', '
     <div class="card">''' + ui("key") + '''
       <h4>Право исключительное</h4>
       <p>У одного есть — у всех остальных нет. Купить нельзя, если владелец не продаёт.</p></div>
-    <div class="card">''' + ui("clock") + '''
+    <div class="card">''' + brand("nintendo") + '''
       <h4>Живёт десятилетиями</h4>
       <p>Mario 1985 года всё ещё закрывает этаж. Барьер входа не денежный, а юридический.</p></div>
-    <div class="card sage">
-      <div class="logos">''' + ico("cdprojekt", 58) + ico("nintendo", 58) + '''</div>
+    <div class="card sage">''' + brand("cdprojekt") + '''
       <h4>Cyberpunk начинается здесь</h4>
       <p>CD&nbsp;Projekt не придумала Найт-Сити — взяла права у Майка Пондсмита.</p></div>
   </div>
@@ -179,8 +182,7 @@ S.append(('04 · Компоненты и аутсорс', '', top("Этаж 04 �
     <div class="card sage">''' + ui("layers") + '''
       <h4>Отдают артефакты,<br>а не «работу»</h4>
       <p>Cyberpunk собран из компонентов: механики, лицевая анимация, звук, QA — всё разными командами.</p></div>
-    <div class="card dark">
-      <div class="logos">''' + ico("rockstargames", 58) + '''</div>
+    <div class="card dark">''' + brand("rockstargames") + '''
       <h4>Контрмодель: Rockstar</h4>
       <p>Свои студии и свой движок RAGE. Внешнего арт-аутсорса почти нет — ценой закрытости.</p></div>
   </div>
@@ -254,10 +256,10 @@ S.append(('Раздел 02 — горлышко', 'dark sec', '<div class="huge"
 S.append(('Понятие горлышка', '', top("Понятие · бутылочное горлышко") + '''
   <h2 class="r" style="--i:0">Уровень, где мало игроков,<br>а зависят от них все</h2>
   <div class="cards r" style="--i:1;grid-template-columns:1.5fr 1fr;margin-top:24px">
-    <div style="display:flex;flex-direction:column;gap:16px;min-height:0">
+    <div class="col">
       <div class="card"><div class="kn">Признак 1</div>
         <h4>Мало игроков</h4>
-        <p>Считаем не компании, а тех, к кому реально можно пойти. Сотня студий аутсорса — много. Шесть витрин — мало.</p></div>
+        <p>Считаем тех, к кому реально можно пойти. Сотня студий — много, шесть витрин — мало.</p></div>
       <div class="card"><div class="kn">Признак 2</div>
         <h4>Нет альтернативы</h4>
         <p>Можно заменить — больно, дорого, но можно — это не горлышко.</p></div>
@@ -315,10 +317,10 @@ CASES = [
 S.append(('Когда витрина выключила игру', '', top("Горлышко · проверенные случаи") + '''
   <h2 class="r" style="--i:0;margin-bottom:22px">Три раза, когда витрина просто<br>выключила готовую игру</h2>
   <div class="cards c3 r" style="--i:1">'''
-  + "".join('<div class="card"><div class="logos">%s</div>'
+  + "".join('<div class="card"><div class="badge">%s</div>'
             '<h4>%s</h4><div class="kn" style="margin:-6px 0 14px">%s</div>'
             '<p>%s</p><p style="margin-top:auto;padding-top:16px;color:var(--ink);font-weight:700">%s</p></div>'
-            % (ico(s, 70), t, sub, b, k) for s, t, sub, b, k in CASES)
+            % (ico(s), t, sub, b, k) for s, t, sub, b, k in CASES)
   + '''</div>
   <p class="note after r" style="--i:2">Игра была готова и куплена. Отказал <b style="color:var(--flame-ink)">только уровень витрины</b> — и этого хватило.</p>'''))
 

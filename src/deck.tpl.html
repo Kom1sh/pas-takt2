@@ -165,7 +165,10 @@ b{font-weight:700}
 .s > .cards{flex:1;min-height:0}
 /* карточки не растягиваются на всю высоту: короткий текст в высокой карточке
    оставлял пустоты сверху и снизу. Ряд карточек центрируется в кадре целиком */
-.s > .cards{align-items:stretch}
+.s > .cards{align-items:stretch;grid-auto-rows:minmax(0,1fr)}
+.col{display:flex;flex-direction:column;gap:16px;min-height:0}
+.col > .card{flex:1;min-height:0;justify-content:center;padding:22px 28px}
+.col > .card > .kn{margin-bottom:10px}
 .s > .cards > .card{min-height:0}
 /* якорь карточки (иконка, метка, ряд логотипов) держится сверху, текст уходит вниз —
    карточка заполняет ряд без пустот посередине */
@@ -173,7 +176,8 @@ b{font-weight:700}
 .card.mid{justify-content:center}
 .card.mid > .badge,.card.mid > .kn,.card.mid > .logos{margin-bottom:22px}
 .logos{display:flex;gap:18px;flex-wrap:wrap}
-.logos .ic{width:64px!important;height:64px!important}
+.logos .ic{width:86px!important;height:86px!important}
+.badge .ic{width:104px!important;height:104px!important}
 .s > h2{margin-bottom:28px}
 .vs{justify-content:center}
 .c2{grid-template-columns:1fr 1fr}
