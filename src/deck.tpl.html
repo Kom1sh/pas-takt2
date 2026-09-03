@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Геймдев · Такт 2 — объекты конкуренции и бутылочные горлышки</title>
+<style>
+/*FONTS*/
+
+/* ============ tokens ============ */
+:root{
+  --void:#0B0A07;          /* warm black ground */
+  --void-2:#131109;
+  --rule:#2A2618;
+  --rule-hi:#3D3722;
+  --yellow:#FCEE0A;        /* RESERVED: объект конкуренции */
+  --cyan:#14E3F0;          /* structure: уровни, карта */
+  --red:#FF2E4D;           /* RESERVED: горлышко / отказ */
+  --bone:#EDE8D8;
+  --dim:#8A8268;
+  --dim-2:#5E5844;
+
+  --d:'Oswald', 'Arial Narrow', 'Haettenschweiler', sans-serif;
+  --b:'Geologica', 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--void);overflow:hidden}
+body{font-family:var(--b);color:var(--bone);-webkit-font-smoothing:antialiased}
+
+/* ============ 16:9 stage ============ */
+#stage{position:fixed;inset:0;overflow:hidden;background:var(--void)}
+/* absolute centring: a scaled box larger than the viewport must not rely on
+   layout alignment, or it overflows to one side and gets clipped */
+#deck{
+  position:absolute;left:50%;top:50%;width:1600px;height:900px;
+  transform:translate(-50%,-50%) scale(var(--s,1));transform-origin:center center;
+  background:var(--void);overflow:hidden;
+}
+
+/* faint industrial grid — sits under everything, never competes */
+#deck::before{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(var(--rule) 1px,transparent 1px),
+                   linear-gradient(90deg,var(--rule) 1px,transparent 1px);
+  background-size:100px 100px;opacity:.20;
+}
+
+/* ============ persistent layer gauge (left rail) ============ */
+#rail{position:absolute;left:0;top:0;bottom:0;width:86px;z-index:6;
+  border-right:1px solid var(--rule-hi);background:linear-gradient(180deg,#100E09,#0B0A07)}
+#rail .rl{position:absolute;left:31px;top:118px;bottom:96px;width:1px;background:var(--rule-hi)}
+.tick{position:absolute;left:0;width:86px;height:22px;display:flex;align-items:center;gap:9px;padding-left:18px;
+  transition:opacity .3s ease}
+.tick i{display:block;width:27px;height:2px;background:var(--dim-2);flex:none;transition:all .35s cubic-bezier(.2,.8,.2,1)}
+.tick b{font-family:var(--d);font-weight:500;font-size:14px;color:var(--dim-2);line-height:1;
+  font-variant-numeric:tabular-nums;transition:color .35s ease}
+.tick[data-neck] i{background:#5A2230}
+.tick.on i{background:var(--cyan);width:44px;box-shadow:0 0 14px rgba(20,227,240,.55)}
+.tick.on b{color:var(--cyan)}
+.tick.on[data-neck] i{background:var(--red);box-shadow:0 0 14px rgba(255,46,77,.6)}
+.tick.on[data-neck] b{color:var(--red)}
+#rail .cap{position:absolute;left:18px;font-family:var(--d);font-weight:500;font-size:11px;
+  letter-spacing:.14em;color:var(--dim-2);writing-mode:vertical-rl}
+#rail .cap.t{top:34px}
+#rail .cap.b{bottom:30px}
+
+/* ============ slide chrome ============ */
+.s{position:absolute;inset:0;z-index:2;padding:64px 88px 76px 150px;
+  opacity:0;visibility:hidden;pointer-events:none;display:flex;flex-direction:column}
+.s.live{opacity:1;visibility:visible;pointer-events:auto}
+
+/* top meta bar */
+.meta{position:absolute;top:34px;left:150px;right:88px;display:flex;justify-content:space-between;
+  align-items:baseline;font-family:var(--d);font-weight:500;font-size:13px;letter-spacing:.15em;color:var(--dim)}
+.meta .num{color:var(--dim-2);font-variant-numeric:tabular-nums}
+.meta .num em{font-style:normal;color:var(--bone)}
+
+/* bottom hairline */
+.s::after{content:"";position:absolute;left:150px;right:88px;bottom:44px;height:1px;background:var(--rule-hi)}
+
+h1{font-family:var(--d);font-weight:700;letter-spacing:-.005em;line-height:.94;color:var(--bone)}
+h2{font-family:var(--d);font-weight:700;font-size:56px;line-height:1.08;letter-spacing:-.005em;color:var(--bone)}
+h3{font-family:var(--d);font-weight:500;font-size:22px;line-height:1.2;color:var(--cyan);letter-spacing:.02em}
+p{font-size:21px;line-height:1.5;color:var(--bone);max-width:74ch}
+.lede{font-size:26px;line-height:1.42}
+.mut{color:var(--dim)}
+strong{font-weight:600;color:#fff}
+.ob{color:var(--yellow)}        /* объект конкуренции — ONLY */
+.nk{color:var(--red)}           /* горлышко — ONLY */
+.cy{color:var(--cyan)}
+
+/* reveal: staggered, fires on slide entry */
+.r{opacity:0;transform:translateY(14px)}
+.s.live .r{animation:rise .5s cubic-bezier(.2,.8,.2,1) forwards;animation-delay:calc(var(--i,0)*70ms + 120ms)}
+@keyframes rise{to{opacity:1;transform:none}}
+
+/* ============ title slide ============ */
+.title{justify-content:center;padding-left:150px}
+.title h1{font-size:188px;letter-spacing:-.02em;line-height:1.03}
+.title .glow{color:var(--yellow);text-shadow:0 0 60px rgba(252,238,10,.30)}
+.title .sub{font-family:var(--d);font-weight:500;font-size:34px;letter-spacing:.02em;color:var(--bone);margin-top:22px}
+.title .tag{font-size:19px;color:var(--dim);margin-top:20px;max-width:60ch;line-height:1.5}
+.title .bar{width:132px;height:5px;background:var(--yellow);margin:36px 0 0}
+
+/* ============ the map ============ */
+.map{width:100%;border-top:1px solid var(--rule-hi);flex:1;display:flex;flex-direction:column}
+.row{display:grid;grid-template-columns:30px 300px 1fr 290px;align-items:center;gap:0 22px;
+  border-bottom:1px solid var(--rule);min-height:60px;padding:5px 0;position:relative;flex:1}
+.row .n{font-family:var(--d);font-weight:500;font-size:15px;color:var(--dim-2);font-variant-numeric:tabular-nums}
+.row .lvl{font-family:var(--d);font-weight:700;font-size:23px;letter-spacing:.012em;color:var(--bone);line-height:1.1}
+.row .obj{font-size:19px;line-height:1.25;color:var(--yellow);font-weight:400}
+.row .who{font-size:15px;line-height:1.3;color:var(--dim);text-align:right}
+.row.neck{background:linear-gradient(90deg,rgba(255,46,77,.13),rgba(255,46,77,0) 76%)}
+.row.neck .lvl{color:var(--red)}
+.row.neck .n{color:var(--red)}
+.row.neck::before{content:"";position:absolute;left:-24px;top:0;bottom:0;width:3px;background:var(--red)}
+.maphead{display:grid;grid-template-columns:30px 300px 1fr 290px;gap:0 22px;padding-bottom:9px;
+  font-family:var(--d);font-weight:500;font-size:12.5px;letter-spacing:.16em;color:var(--dim-2)}
+.maphead .r3{text-align:right}
+
+/* ============ generic blocks ============ */
+.cols{display:grid;gap:30px;margin-top:28px}
+.c2{grid-template-columns:1fr 1fr}
+.c3{grid-template-columns:repeat(3,1fr)}
+.blk{border-top:2px solid var(--rule-hi);padding-top:15px}
+.blk.y{border-top-color:var(--yellow)}
+.blk.c{border-top-color:var(--cyan)}
+.blk.r_{border-top-color:var(--red)}
+.blk h4{font-family:var(--d);font-weight:700;font-size:22px;line-height:1.14;margin-bottom:9px;color:var(--bone)}
+.blk p{font-size:17.5px;line-height:1.46;color:var(--dim)}
+.blk p + p{margin-top:9px}
+
+ul{list-style:none}
+li{position:relative;padding-left:26px;font-size:20px;line-height:1.44;margin-bottom:13px;max-width:70ch}
+li::before{content:"";position:absolute;left:0;top:.62em;width:12px;height:2px;background:var(--cyan)}
+li.y::before{background:var(--yellow)}
+li.r_::before{background:var(--red)}
+
+/* before / after */
+.balist{flex:1;display:flex;flex-direction:column;border-top:1px solid var(--rule-hi)}
+.ba{flex:1;display:grid;grid-template-columns:1fr 46px 1fr;align-items:center;gap:0 16px;
+  border-bottom:1px solid var(--rule);padding:13px 0}
+.ba .was{font-size:18.5px;color:var(--dim-2);text-decoration:line-through;text-decoration-color:#4A4433}
+.ba .arw{color:var(--dim-2);text-align:center;font-size:19px}
+.ba .now{font-size:19.5px;color:var(--bone)}
+.ba .now em{font-style:normal;color:var(--yellow)}
+
+/* chain of dependency */
+.chain{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:32px;flex:1;align-items:stretch}
+.ch{border-left:2px solid var(--rule-hi);padding:4px 20px 0 17px;position:relative;display:flex;flex-direction:column}
+.chain .ch:last-child{border-right:2px solid var(--rule-hi)}
+.ch .v{margin-top:auto;padding-bottom:6px;font-size:18px;font-weight:600;color:#fff}
+.ch.dead .v{color:var(--red)}
+.ch:first-child{border-left-color:var(--cyan)}
+.ch.dead{border-left-color:var(--red)}
+.ch .q{font-family:var(--d);font-weight:700;font-size:19px;color:var(--bone);margin-bottom:8px;line-height:1.16}
+.ch .a{font-size:16.5px;line-height:1.42;color:var(--dim)}
+.ch.dead .q{color:var(--red)}
+
+/* stat */
+.stat{font-family:var(--d);font-weight:700;font-size:82px;line-height:.9;color:var(--yellow);
+  font-variant-numeric:tabular-nums;letter-spacing:-.015em}
+.stat.r_{color:var(--red)}
+.stat small{display:block;font-family:var(--b);font-weight:400;font-size:16px;letter-spacing:0;
+  color:var(--dim);margin-top:11px;line-height:1.36}
+
+/* glossary */
+.gl{display:grid;grid-template-columns:1fr 1fr;gap:0 56px}
+.gi{border-bottom:1px solid var(--rule);padding:17px 0;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:baseline}
+.gi dt{font-family:var(--d);font-weight:700;font-size:21px;color:var(--cyan);white-space:nowrap;line-height:1.16}
+.gi dd{font-size:16.5px;line-height:1.4;color:var(--dim)}
+
+/* pull quote / open question */
+.pull{font-family:var(--d);font-weight:700;font-size:66px;line-height:1.09;letter-spacing:-.008em;max-width:22ch}
+.aside{font-size:18px;color:var(--dim);line-height:1.5;max-width:62ch}
+
+/* section divider slide */
+.sec{justify-content:center}
+.sec .kick{font-family:var(--d);font-weight:500;font-size:16px;letter-spacing:.24em;color:var(--dim);margin-bottom:18px}
+.sec h2{font-size:104px;line-height:.98}
+
+.s.vc{justify-content:center}
+.note.after{margin-top:32px}
+.sp{flex:1}
+.mt{margin-top:auto}
+.note{font-size:16px;color:var(--dim-2);line-height:1.45;max-width:80ch}
+
+/* ============ transition: scan-wipe + channel split ============ */
+#wipe{position:absolute;inset:0;z-index:20;pointer-events:none;opacity:0}
+#wipe.go{animation:scan .42s linear}
+@keyframes scan{
+  0%{opacity:1;background:linear-gradient(90deg,transparent 0%,rgba(252,238,10,.10) 44%,rgba(252,238,10,.85) 50%,rgba(20,227,240,.30) 56%,transparent 100%);
+     background-size:260% 100%;background-position:-80% 0}
+  100%{opacity:1;background:linear-gradient(90deg,transparent 0%,rgba(252,238,10,.10) 44%,rgba(252,238,10,.85) 50%,rgba(20,227,240,.30) 56%,transparent 100%);
+     background-size:260% 100%;background-position:180% 0}
+}
+.s.in{animation:split .34s cubic-bezier(.2,.8,.2,1)}
+@keyframes split{
+  0%{opacity:0;transform:translateX(var(--dir,22px));filter:blur(0)}
+  28%{opacity:1;text-shadow:2.5px 0 rgba(255,46,77,.65),-2.5px 0 rgba(20,227,240,.65)}
+  100%{opacity:1;transform:none;text-shadow:none}
+}
+
+/* ============ overview ============ */
+#ov{position:fixed;inset:0;z-index:40;background:rgba(6,6,4,.97);display:none;
+  grid-template-columns:repeat(5,1fr);gap:16px;padding:40px;overflow:auto;align-content:start}
+#ov.on{display:grid}
+.ovc{aspect-ratio:16/9;border:1px solid var(--rule-hi);background:var(--void-2);cursor:pointer;
+  padding:13px;display:flex;flex-direction:column;justify-content:space-between;transition:border-color .18s}
+.ovc:hover,.ovc:focus-visible{border-color:var(--yellow);outline:none}
+.ovc.cur{border-color:var(--cyan)}
+.ovc .t{font-family:var(--d);font-weight:700;font-size:15px;line-height:1.14;color:var(--bone)}
+.ovc .i{font-family:var(--d);font-size:12px;color:var(--dim-2);font-variant-numeric:tabular-nums}
+.ovc.cur .i{color:var(--cyan)}
+
+/* ============ help ============ */
+#help{position:fixed;right:14px;bottom:12px;z-index:30;font-size:12px;color:#4A4433;
+  font-family:var(--d);letter-spacing:.1em;transition:opacity .5s;pointer-events:none}
+#help.hide{opacity:0}
+
+:focus-visible{outline:2px solid var(--yellow);outline-offset:3px}
+
+/* ============ reduced motion ============ */
+@media (prefers-reduced-motion:reduce){
+  #wipe.go{animation:none}
+  .s.in{animation:none}
+  .s.live .r{animation:none;opacity:1;transform:none}
+  .tick i,.tick b{transition:none}
+}
+
+/* ============ print → PDF, one slide per landscape page ============ */
+@media print{
+  @page{size:1600px 900px;margin:0}
+  html,body{overflow:visible;height:auto;background:#fff}
+  #stage{position:static;display:block}
+  #deck{position:static;left:auto;top:auto;transform:none;width:1600px;height:auto;overflow:visible}
+  #rail,#help,#ov,#wipe{display:none!important}
+  .s{position:relative;inset:auto;width:1600px;height:900px;opacity:1!important;visibility:visible!important;
+     page-break-after:always;break-after:page;background:var(--void);padding-left:110px}
+  .s:last-of-type{page-break-after:auto;break-after:auto}
+  .s .r{opacity:1!important;transform:none!important;animation:none!important}
+  .meta{left:110px}
+  .s::after{left:110px}
+  #deck::before{display:none}
+}
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <div id="deck">
+    <div id="wipe"></div>
+
+    <nav id="rail" aria-label="Уровни карты">
+      <span class="cap t">ГЕЙМДЕВ</span>
+      <div class="rl"></div>
+      <span class="cap b">ИГРОК</span>
+    </nav>
+
+<!--SLIDES-->
+
+  </div>
+</div>
+
+<div id="ov" role="dialog" aria-label="Все слайды" aria-modal="true"></div>
+<div id="help">← → СЛАЙДЫ · O ОБЗОР · F ПОЛНЫЙ ЭКРАН</div>
+
+<script>
+(function(){
+  'use strict';
+  var deck=document.getElementById('deck');
+  var slides=[].slice.call(deck.querySelectorAll('.s'));
+  var rail=document.getElementById('rail');
+  var wipe=document.getElementById('wipe');
+  var ov=document.getElementById('ov');
+  var help=document.getElementById('help');
+  var cur=0, total=slides.length;
+  var NECK=8; // floor 8 is the bottleneck
+  var reduce=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  /* ---- build the layer gauge: 8 floors ---- */
+  var railTop=118, railBot=96, ticks=[];
+  (function(){
+    var span=900-railTop-railBot;
+    for(var f=1;f<=8;f++){
+      var t=document.createElement('div');
+      t.className='tick';
+      if(f===NECK) t.setAttribute('data-neck','');
+      t.style.top=(railTop+(f-1)*(span/7)-11)+'px';
+      t.innerHTML='<i></i><b>'+f+'</b>';
+      rail.appendChild(t); ticks.push(t);
+    }
+  })();
+
+  /* ---- scale the 16:9 stage to the viewport ---- */
+  function fit(){
+    var s=Math.min(window.innerWidth/1600, window.innerHeight/900);
+    deck.style.setProperty('--s', s);
+  }
+  window.addEventListener('resize',fit,{passive:true}); fit();
+
+  /* ---- navigate ---- */
+  function show(n,dir){
+    n=Math.max(0,Math.min(total-1,n));
+    if(n===cur && slides[cur].classList.contains('live')) return;
+    var prev=cur; cur=n;
+
+    slides[prev].classList.remove('live','in');
+    var el=slides[cur];
+    el.classList.add('live');
+
+    if(!reduce){
+      el.style.setProperty('--dir',(dir<0?-22:22)+'px');
+      void el.offsetWidth;              // restart the entry animation
+      el.classList.add('in');
+      wipe.classList.remove('go'); void wipe.offsetWidth; wipe.classList.add('go');
+    }
+
+    // restart the staggered reveal inside the slide
+    var rs=el.querySelectorAll('.r');
+    for(var i=0;i<rs.length;i++){ rs[i].style.animation='none'; }
+    void el.offsetWidth;
+    for(var j=0;j<rs.length;j++){ rs[j].style.animation=''; }
+
+    var floor=parseInt(el.getAttribute('data-floor')||'0',10);
+    for(var k=0;k<ticks.length;k++) ticks[k].classList.toggle('on', k+1===floor);
+
+    var c=el.querySelector('.num em'); if(c) c.textContent=String(cur+1).padStart(2,'0');
+    if(ov.classList.contains('on')) syncOv();
+    try{ history.replaceState(null,'','#'+(cur+1)); }catch(e){}
+  }
+  var next=function(){ show(cur+1, 1); };
+  var prev=function(){ show(cur-1,-1); };
+
+  /* ---- overview ---- */
+  function buildOv(){
+    ov.innerHTML='';
+    slides.forEach(function(s,i){
+      var b=document.createElement('button');
+      b.className='ovc'+(i===cur?' cur':'');
+      b.innerHTML='<div class="t">'+(s.getAttribute('data-t')||'')+'</div>'+
+                  '<div class="i">'+String(i+1).padStart(2,'0')+' / '+String(total).padStart(2,'0')+'</div>';
+      b.addEventListener('click',function(){ toggleOv(false); show(i, i>cur?1:-1); });
+      ov.appendChild(b);
+    });
+  }
+  function syncOv(){
+    var cs=ov.children;
+    for(var i=0;i<cs.length;i++) cs[i].classList.toggle('cur', i===cur);
+  }
+  function toggleOv(on){
+    var want = (on===undefined) ? !ov.classList.contains('on') : on;
+    ov.classList.toggle('on', want);
+    if(want){ buildOv(); var c=ov.querySelector('.cur'); if(c) c.focus(); }
+  }
+
+  /* ---- keys ---- */
+  document.addEventListener('keydown',function(e){
+    if(e.metaKey||e.ctrlKey||e.altKey) return;
+    var k=e.key;
+    if(ov.classList.contains('on')){
+      if(k==='Escape'||k==='o'||k==='O'||k==='щ'||k==='Щ'){ e.preventDefault(); toggleOv(false); }
+      return;
+    }
+    if(k==='ArrowRight'||k==='PageDown'||k===' '||k==='Enter'||k==='ArrowDown'){ e.preventDefault(); next(); }
+    else if(k==='ArrowLeft'||k==='PageUp'||k==='ArrowUp'||k==='Backspace'){ e.preventDefault(); prev(); }
+    else if(k==='Home'){ e.preventDefault(); show(0,-1); }
+    else if(k==='End'){ e.preventDefault(); show(total-1,1); }
+    else if(k==='o'||k==='O'||k==='щ'||k==='Щ'){ e.preventDefault(); toggleOv(); }
+    else if(k==='f'||k==='F'||k==='а'||k==='А'){ e.preventDefault();
+      if(document.fullscreenElement) document.exitFullscreen(); else document.documentElement.requestFullscreen(); }
+  });
+
+  /* ---- click / swipe ---- */
+  document.getElementById('stage').addEventListener('click',function(e){
+    if(ov.classList.contains('on')) return;
+    (e.clientX < window.innerWidth*0.24) ? prev() : next();
+  });
+  var tx=0,ty=0;
+  document.addEventListener('touchstart',function(e){ tx=e.changedTouches[0].clientX; ty=e.changedTouches[0].clientY; },{passive:true});
+  document.addEventListener('touchend',function(e){
+    var dx=e.changedTouches[0].clientX-tx, dy=e.changedTouches[0].clientY-ty;
+    if(Math.abs(dx)>52 && Math.abs(dx)>Math.abs(dy)) (dx<0?next:prev)();
+  },{passive:true});
+
+  /* ---- fade the hint away ---- */
+  setTimeout(function(){ help.classList.add('hide'); },5200);
+
+  /* ---- boot ---- */
+  slides.forEach(function(s){
+    var m=s.querySelector('.meta .num');
+    if(m) m.innerHTML='<em>01</em> / '+String(total).padStart(2,'0');
+  });
+  var start=parseInt((location.hash||'#1').slice(1),10);
+  show(isNaN(start)?0:start-1, 1);
+})();
+</script>
+</body>
+</html>
