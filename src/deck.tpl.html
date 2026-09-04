@@ -178,6 +178,12 @@ b{font-weight:700}
 .logos{display:flex;gap:18px;flex-wrap:wrap}
 .logos .ic{width:86px!important;height:86px!important}
 .badge .ic{width:104px!important;height:104px!important}
+/* растровые логотипы: высота фиксирована, ширина по пропорции */
+img.ic{width:auto!important;object-fit:contain;display:block}
+.lvl .who img.ic{height:40px!important;max-width:104px}
+.tile img.ic{height:52px!important;max-width:150px}
+.badge img.ic{height:72px!important;max-width:132px}
+.logos img.ic{height:54px!important;max-width:150px}
 .s > h2{margin-bottom:28px}
 .vs{justify-content:center}
 .c2{grid-template-columns:1fr 1fr}
