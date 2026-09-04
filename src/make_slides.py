@@ -40,11 +40,14 @@ UI = {
  "nomoney":'<rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M2.5 21.5 L21.5 2.5"/>',
  "compare":'<rect x="2.5" y="5" width="9" height="6" rx="1.4"/><rect x="2.5" y="14" width="15" height="6" rx="1.4"/><path d="M21.5 3.5v17"/>',
  "doc":   '<path d="M6 2.5h8l4 4v15H6z"/><path d="M14 2.5v4h4"/><path d="M9 12h6"/><path d="M9 16h6"/>',
- "gate":  '<path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/><path d="M3 21h18"/>',
  "layers":'<path d="M12 3 2.5 8 12 13l9.5-5z"/><path d="M2.5 12.5 12 17.5l9.5-5"/><path d="M2.5 17 12 22l9.5-5"/>',
  "link":  '<path d="M10 14a4.5 4.5 0 0 0 6.4 0l2.6-2.6a4.5 4.5 0 0 0-6.4-6.4L11.2 6.4"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0L5 12.6a4.5 4.5 0 0 0 6.4 6.4l1.4-1.4"/>',
  "shield":'<path d="M12 2.5 4 6v6c0 5 3.4 8.4 8 9.5 4.6-1.1 8-4.5 8-9.5V6z"/><path d="M9 12l2 2 4-4"/>',
  "eye":   '<path d="M1.5 12S5.5 5 12 5s10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3"/>',
+ "funnel": '<path d="M2.5 4.5h19l-7.4 8.6V21l-4.2-2.6v-5.3z"/>',
+ "unlock": '<rect x="4" y="10.5" width="16" height="10.5" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 7.6-1.7"/>',
+ "pen": '<path d="M4 20l3.2-.7L20 6.5a2.1 2.1 0 0 0-3-3L4.2 16.3z"/><path d="M15.5 5.5l3 3"/><path d="M4 20l.9-4"/>',
+ "percent": '<path d="M19.5 4.5 4.5 19.5"/><circle cx="7.8" cy="7.8" r="2.9"/><circle cx="16.2" cy="16.2" r="2.9"/>',
  "clock": '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
  "no":    '<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/>',
  "play":  '<rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="M10 9v6l5-3z"/>',
@@ -89,7 +92,7 @@ def top(pill):
 
 import math
 from content import (MAP, FLOORS, PLAT_VS_SHOP, VS_PAIRS, CHAIN, CHAIN_NOTE,
-                     PIPELINE, PIPELINE_NOTE, PIPELINE_ACCENT, MEASURE_FIGS, MEASURE_CARDS,
+                     PIPELINE, PIPELINE_ICONS, PIPELINE_NOTE, PIPELINE_ACCENT, MEASURE_FIGS, MEASURE_CARDS,
                      MULTI, MULTI_NOTE, MULTI_SUB, FAILTEST, CASES, TERMS, SOURCES,
                      SOURCES_NOTE, GATES, OUTS)
 
@@ -104,7 +107,8 @@ def nl(t):
 def anchor(icon, logos, kn):
     inner = ""
     if logos:
-        inner += '<div class="logos">' + "".join(ico(x) for x in logos) + "</div>"
+        cls = "logos solo" if len(logos) == 1 else "logos"
+        inner += '<div class="%s">' % cls + "".join(ico(x) for x in logos) + "</div>"
     if icon:
         inner += ui(icon)
     if kn:
@@ -169,27 +173,25 @@ for f in FLOORS:
     S.append(("%s · %s" % (f["no"], f["title"].split(":")[0]), '', body))
 
 S.append(('Цепочка удержания', '', top("Этаж 08 · цепочка удержания") + '''
-  <h2 class="r" style="--i:0;margin-bottom:24px">Как время игрока превращается<br>в его пожизненную ценность</h2>
-  <div class="cards r" style="--i:1;grid-template-columns:repeat(6,1fr);gap:12px">'''
-  + "".join('<div class="card%s"><h4 style="font-size:20px">%s</h4><p style="font-size:16px">%s</p></div>'
-            % (" hot" if i == len(CHAIN) - 1 else "", nl(t), sub) for i, (t, sub) in enumerate(CHAIN))
-  + '</div>\n  <p class="note after r" style="--i:2">%s</p>' % CHAIN_NOTE))
+  <h2 class="r" style="--i:0;margin-bottom:14px">Как время игрока превращается<br>в его пожизненную ценность</h2>
+  <div class="pipe compact r" style="--i:1">'''
+  + '<div class="ar"></div>'.join(
+      '<div class="st mid%s"><div class="no">%02d</div><h5>%s</h5><p>%s</p></div>'
+      % (" last" if i == len(CHAIN) - 1 else "", i + 1, nl(t), sub_)
+      for i, (t, sub_) in enumerate(CHAIN))
+  + '''</div>
+  <p class="note after r" style="--i:2">%s</p>''' % CHAIN_NOTE))
 
 S.append(('Пайплайн выхода на витрину', '', top("Этаж 08 · зависимость разработчика") + '''
-  <h2 class="r" style="--i:0;margin-bottom:22px">Что нужно разработчику,<br>чтобы игра появилась на витрине</h2>
-  <div class="cards r" style="--i:1;grid-template-columns:repeat(5,1fr);gap:13px">'''
-  + "".join('<div class="card"><div class="anchor"><div class="kn" style="font-size:24px;color:var(--flame)">%d</div></div>'
-            '<h4 style="font-size:21px">%s</h4><p style="font-size:16px">%s</p></div>'
-            % (i + 1, t, b) for i, (t, b) in enumerate(PIPELINE))
-  + '</div>\n  <p class="note after r" style="--i:2">%s<br><b style="color:var(--flame-ink)">%s</b></p>'
+  <h2 class="r" style="--i:0;margin-bottom:14px">Что нужно разработчику,<br>чтобы игра появилась на витрине</h2>
+  <div class="pipe r" style="--i:1">'''
+  + '<div class="ar"></div>'.join(
+      '<div class="st"><div class="no">ШАГ %d</div>%s<h5>%s</h5><p>%s</p></div>'
+      % (i + 1, ui(PIPELINE_ICONS[i]), t, b)
+      for i, (t, b) in enumerate(PIPELINE))
+  + '''</div>
+  <p class="note after r" style="--i:2">%s <b style="color:var(--flame-ink)">%s</b></p>'''
     % (PIPELINE_NOTE, PIPELINE_ACCENT)))
-
-S.append(('Измеримость объекта', 'dark', top("Этаж 08 · чем измеряем объект") + '''
-  <h2 class="r" style="--i:0">Если объект нельзя измерить —<br>мы его не называем</h2>
-  <div class="figs r" style="--i:1;margin-top:34px">'''
-  + "".join('<div class="fig"><div class="n">%s</div><div class="l">%s</div></div>' % (n, l) for n, l in MEASURE_FIGS)
-  + '</div>\n  <div class="cards c2 r" style="--i:2;margin-top:36px">'
-  + "".join(card("dark mid", None, t, b) for t, b in MEASURE_CARDS) + '</div>'))
 
 def grp2(cap, tiles, cols, hot=False):
     return ('<div class="wallgrp%s"><div class="cap">%s</div><div class="grid" '
@@ -201,13 +203,13 @@ S.append(('Позиция на одном этаже — рычаг на дру�
   <div class="cards c2 r" style="--i:1;flex:0 0 auto">'''
   + "".join(
       '<div class="card"><div class="anchor"><div class="kn">%s</div></div>'
-      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">%s</div></div>'
+      '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">%s</div></div>'
       % (name, "".join(
           '<div style="background:var(--paper-2);border-radius:12px;padding:14px 12px;text-align:center">'
           '<div style="font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--muted);'
           'text-transform:uppercase;margin-bottom:10px">%s</div>'
           '<div style="display:flex;justify-content:center;margin-bottom:10px">%s</div>'
-          '<div style="font-size:14px;font-weight:700;line-height:1.2">%s</div></div>'
+          '<div style="font-size:13px;font-weight:700;line-height:1.2">%s</div></div>'
           % (lab, ico(slug), sub) for lab, slug, sub in items))
       for name, items in MULTI)
   + '''</div>

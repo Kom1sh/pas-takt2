@@ -129,6 +129,26 @@ b{font-weight:700}
 .wallgrp.hot .cap em{color:var(--ink)}
 .wallgrp .grid{display:grid;gap:9px;flex:1;min-height:0}
 
+/* ============ пайплайн: шаги со стрелками ============ */
+.pipe{display:flex;align-items:stretch;gap:0;flex:1;min-height:0;margin-top:8px}
+/* цепочка без иконок — шаги по контенту и по центру полосы */
+.pipe.compact{align-items:center}
+.pipe .st{flex:1;min-width:0;background:var(--tile);border-radius:16px;padding:24px 22px;
+  display:flex;flex-direction:column}
+.pipe .st.last{background:var(--flame)}
+/* шаг без иконки — контент по центру, иначе низ пустует */
+.pipe .st.mid{justify-content:center;align-self:center}
+.pipe .st.mid h5{margin-top:0}
+.pipe .st .no{font-size:13px;font-weight:800;letter-spacing:.1em;color:var(--flame-ink);margin-bottom:14px}
+.pipe .st.last .no{color:rgba(22,20,15,.7)}
+.pipe .st .ui{width:56px;height:56px;margin-bottom:auto}
+.pipe .st.last .ui{stroke:var(--ink)}
+.pipe .st h5{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.12;margin:16px 0 8px}
+.pipe .st p{font-size:15px;line-height:1.32;color:var(--muted);max-width:none}
+.pipe .st.last p{color:rgba(22,20,15,.78)}
+.pipe .ar{flex:0 0 34px;display:flex;align-items:center;justify-content:center}
+.pipe .ar::after{content:"";width:0;height:0;border:9px solid transparent;border-left:12px solid var(--flame)}
+
 /* ============ платформа против витрины ============ */
 .pvs{background:var(--tile);border-radius:16px;padding:22px 28px;margin-top:18px;
      font-size:21px;line-height:1.4;color:var(--muted)}
@@ -136,12 +156,12 @@ b{font-weight:700}
 
 /* ============ смысловые иконки ============ */
 /* иконка — иллюстрация в круглом бейдже, а не буллит */
-.badge{width:176px;height:176px;border-radius:50%;background:var(--paper-2);display:grid;
+.badge{width:150px;height:150px;border-radius:50%;background:var(--paper-2);display:grid;
     place-items:center;flex:none}
 .card.dark .badge{background:rgba(241,236,227,.1)}
 .card.sage .badge{background:rgba(255,255,255,.72)}
 .card.hot .badge{background:rgba(22,20,15,.12)}
-.ui{width:98px;height:98px;flex:none;stroke:var(--flame);stroke-width:1.5;fill:none;
+.ui{width:84px;height:84px;flex:none;stroke:var(--flame);stroke-width:1.5;fill:none;
     stroke-linecap:round;stroke-linejoin:round}
 .card.dark .ui{stroke:var(--flame)}
 .card.hot .ui{stroke:var(--ink)}
@@ -167,6 +187,7 @@ b{font-weight:700}
 /* ============ карточки ============ */
 .cards{display:grid;gap:15px}
 .cards > *{min-width:0}
+.card *{min-width:0}
 /* только прямой потомок слайда растёт: вложенные сетки остаются по контенту */
 .s > .cards{flex:1;min-height:0}
 /* карточки не растягиваются на всю высоту: короткий текст в высокой карточке
@@ -179,7 +200,7 @@ b{font-weight:700}
 /* якорь карточки (иконка, метка, ряд логотипов) держится сверху, текст уходит вниз —
    карточка заполняет ряд без пустот посередине */
 /* якорь карточки — один блок сверху, текст прижат к низу */
-.card > .anchor{margin-bottom:auto}
+.card > .anchor{margin-bottom:22px}
 .card > .anchor > .kn{margin-bottom:14px}
 .card > .anchor > .logos + .kn,.card > .anchor > .badge + .kn{margin-top:14px;margin-bottom:0}
 .card.mid > .anchor{margin-bottom:22px}
@@ -188,6 +209,8 @@ b{font-weight:700}
 .card.mid > .badge,.card.mid > .kn,.card.mid > .logos{margin-bottom:22px}
 .logos{display:flex;gap:18px;flex-wrap:wrap}
 .logos .ic{width:86px!important;height:86px!important}
+.logos.solo{justify-content:flex-start}
+.logos.solo .ic{width:170px!important;height:170px!important}
 .badge .ic{width:104px!important;height:104px!important}
 /* растровые логотипы: высота фиксирована, ширина по пропорции */
 img.ic{width:auto!important;object-fit:contain;display:block}
@@ -206,6 +229,10 @@ img.ic{width:auto!important;object-fit:contain;display:block}
 .card.dark .mut{color:rgba(241,236,227,.7)}
 .card.hot{background:var(--flame)}
 .card h4{font-size:30px;font-weight:800;letter-spacing:-.024em;line-height:1.1;margin-bottom:14px}
+/* один ряд — одна высота заголовка, иначе абзацы не выстраиваются по базовой линии */
+.cards.c3 > .card > h4{min-height:2.2em}
+/* блок карточки центрируется целиком: заголовки встают на одну линию */
+.s > .cards.c3 > .card{justify-content:center}
 .card p{font-size:23px;line-height:1.42;color:var(--muted)}
 .card.dark p{color:rgba(241,236,227,.74)}
 .card.hot p{color:rgba(22,20,15,.8)}

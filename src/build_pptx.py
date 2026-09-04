@@ -15,7 +15,7 @@ from PIL import Image
 import sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from content import (MAP, FLOORS, PLAT_VS_SHOP, VS_PAIRS, CHAIN, CHAIN_NOTE, PIPELINE,
-                     PIPELINE_NOTE, PIPELINE_ACCENT, MEASURE_FIGS, MEASURE_CARDS, MULTI,
+                     PIPELINE_ICONS, PIPELINE_NOTE, PIPELINE_ACCENT, MEASURE_FIGS, MEASURE_CARDS, MULTI,
                      MULTI_NOTE, MULTI_SUB, FAILTEST, CASES, TERMS, SOURCES, SOURCES_NOTE)
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -40,10 +40,13 @@ UI = {
  "nomoney":'<rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M2.5 21.5 L21.5 2.5"/>',
  "compare":'<rect x="2.5" y="5" width="9" height="6" rx="1.4"/><rect x="2.5" y="14" width="15" height="6" rx="1.4"/><path d="M21.5 3.5v17"/>',
  "doc":   '<path d="M6 2.5h8l4 4v15H6z"/><path d="M14 2.5v4h4"/><path d="M9 12h6"/><path d="M9 16h6"/>',
- "gate":  '<path d="M3 21V9l9-6 9 6v12"/><path d="M9 21v-7h6v7"/><path d="M3 21h18"/>',
  "layers":'<path d="M12 3 2.5 8 12 13l9.5-5z"/><path d="M2.5 12.5 12 17.5l9.5-5"/><path d="M2.5 17 12 22l9.5-5"/>',
  "shield":'<path d="M12 2.5 4 6v6c0 5 3.4 8.4 8 9.5 4.6-1.1 8-4.5 8-9.5V6z"/><path d="M9 12l2 2 4-4"/>',
  "eye":   '<path d="M1.5 12S5.5 5 12 5s10.5 7 10.5 7-4 7-10.5 7S1.5 12 1.5 12z"/><circle cx="12" cy="12" r="3"/>',
+ "funnel": '<path d="M2.5 4.5h19l-7.4 8.6V21l-4.2-2.6v-5.3z"/>',
+ "unlock": '<rect x="4" y="10.5" width="16" height="10.5" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 7.6-1.7"/>',
+ "pen": '<path d="M4 20l3.2-.7L20 6.5a2.1 2.1 0 0 0-3-3L4.2 16.3z"/><path d="M15.5 5.5l3 3"/><path d="M4 20l.9-4"/>',
+ "percent": '<path d="M19.5 4.5 4.5 19.5"/><circle cx="7.8" cy="7.8" r="2.9"/><circle cx="16.2" cy="16.2" r="2.9"/>',
  "clock": '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
  "no":    '<circle cx="12" cy="12" r="9"/><path d="M5.6 5.6l12.8 12.8"/>',
  "play":  '<rect x="2.5" y="4.5" width="19" height="15" rx="2.5"/><path d="M10 9v6l5-3z"/>',
@@ -233,14 +236,12 @@ def floor(no, name, obj, title, specs, cp):
     text(s, PAD, 6.6, W - 2 * PAD, 0.6, [[("На примере Cyberpunk 2077: ", {"bold": True, "color": FLAME_INK}), cp]], size=12, color=MUTED, line=1.3)
 
 def floors():
-    ICONMAP = {"key": "key", "doc": "doc", "compare": "compare", "layers": "layers",
-               "eye": "eye", "gate": "gate", "clock": "clock", "no": "no", "shield": "shield"}
     for f in FLOORS:
         specs = []
         for kind, kn, title, body, icon, logos in f["cards"]:
             sp = dict(kind=kind, title=title, body=body)
             if kn: sp["kn"] = kn
-            if icon: sp["badge"] = ui_png(ICONMAP[icon])
+            if icon: sp["badge"] = ui_png(icon)
             if logos: sp["logos"] = [ico(x, on_dark=(kind == "dark")) for x in logos[:4]]
             specs.append(sp)
         sl = new_slide(); top(sl, f["pill"]); h2(sl, f["title"])
@@ -275,27 +276,12 @@ def slide_pipeline():
     for i, (t, sub) in enumerate(steps):
         x = PAD + i * (w + gap)
         rect(s, x, y, w, h, TILE, radius=0.14)
-        text(s, x + 0.2, y + 0.22, 0.6, 0.4, f"{i+1}", size=20, bold=True, color=FLAME)
-        text(s, x + 0.2, y + 0.75, w - 0.4, 0.55, t, size=15, bold=True, color=INK, line=1.08)
-        text(s, x + 0.2, y + 1.35, w - 0.4, h - 1.55, sub, size=11.5, color=MUTED, line=1.3)
+        text(s, x + 0.2, y + 0.22, 1.2, 0.3, f"ШАГ {i+1}", size=10, bold=True, color=FLAME_INK)
+        pic(s, ui_png(PIPELINE_ICONS[i]), x + 0.2, y + 0.6, 0.62, 0.62)
+        text(s, x + 0.2, y + 1.4, w - 0.4, 0.55, t, size=15, bold=True, color=INK, line=1.08)
+        text(s, x + 0.2, y + 2.0, w - 0.4, h - 2.2, sub, size=11.5, color=MUTED, line=1.3)
     note(s, PIPELINE_NOTE, y=5.85)
     text(s, PAD, 6.5, W - 2 * PAD, 0.5, PIPELINE_ACCENT, size=12, color=FLAME_INK, bold=True)
-
-def slide_measure():
-    s = new_slide(JET); top(s, "Этаж 08 · измеримость объекта", dark=True)
-    h2(s, "Если объект нельзя измерить —\nмы его не называем", color=PAPER_ON_DARK)
-    figs = MEASURE_FIGS
-    w = (W - 2 * PAD) / 3
-    for i, (n, l) in enumerate(figs):
-        x = PAD + i * w
-        text(s, x, 2.7, w - 0.4, 1.0, n, size=54, bold=True, color=FLAME, line=0.95)
-        text(s, x, 3.75, w - 0.5, 0.8, l, size=12.5, color=C("B8B3A7"), line=1.3)
-        if i: s.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Inches(x - 0.2), Inches(2.75), Inches(x - 0.2), Inches(4.4)).line.color.rgb = C("3A372F")
-    for i, (t, b) in enumerate(MEASURE_CARDS):
-        x = PAD + i * ((W - 2 * PAD) / 2 + 0.1); w2 = (W - 2 * PAD) / 2 - 0.1
-        rect(s, x, 4.85, w2, 1.65, C("232119"), radius=0.14)
-        text(s, x + 0.28, 5.05, w2 - 0.56, 0.4, t, size=15, bold=True, color=PAPER_ON_DARK)
-        text(s, x + 0.28, 5.5, w2 - 0.56, 0.95, b, size=12, color=C("B8B3A7"), line=1.3)
 
 def slide_multi():
     s = new_slide(); top(s, "Кто стоит на нескольких этажах"); h2(s, "Позиция на одном этаже —\nрычаг на другом")
@@ -433,7 +419,7 @@ def slide_terms():
 
 # ── порядок ────────────────────────────────────────────────────────────────
 cover(); slide_gamedev(); slide_object(); section("01", "Карта\nуровней", "Восемь этажей, на каждом свой объект конкуренции.")
-slide_map(); floors(); slide_chain(); slide_pipeline(); slide_measure(); slide_multi(); slide_vs()
+slide_map(); floors(); slide_chain(); slide_pipeline(); slide_multi(); slide_vs()
 section("02", "Бутылочное\nгорлышко", "Ищем его тестом отказом, а не по деньгам на этаже.")
 slide_neck_def(); slide_failtest(); slide_class(); slide_cases(); slide_hidden(); slide_open(); slide_sources(); slide_terms()
 
