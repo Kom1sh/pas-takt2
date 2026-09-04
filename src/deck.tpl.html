@@ -257,6 +257,18 @@ li::before{content:"";position:absolute;left:0;top:.5em;width:13px;height:13px;b
   border:8px solid transparent;border-top:12px solid var(--flame)}
 .fn .out{margin-top:20px;font-size:15px;font-weight:800;letter-spacing:.06em}
 
+/* ============ источники ============ */
+.srcwrap{flex:1;min-height:0;background:var(--tile);border-radius:16px;padding:6px 28px 10px;overflow:hidden}
+.src{width:100%;border-collapse:collapse;font-size:17.5px;line-height:1.3}
+.src th{text-align:left;font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);padding:14px 14px 10px 0;border-bottom:2px solid var(--hair)}
+.src td{padding:10px 14px 10px 0;border-bottom:1px solid var(--hair);vertical-align:top}
+.src tr:last-child td{border-bottom:none}
+.src td.c1{font-weight:600;color:var(--ink);width:46%}
+.src td.c2{color:var(--muted);width:15%;white-space:nowrap}
+.src td.c3 a{color:var(--flame-ink);font-weight:600;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1.5px}
+.src td.c3 .x{color:var(--muted);font-size:15px}
+
 /* ============ глоссарий ============ */
 .gl{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:11px;min-height:0}
 .gi{background:var(--tile);border-radius:14px;padding:20px 26px;display:flex;flex-direction:column;

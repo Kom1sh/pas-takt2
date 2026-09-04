@@ -192,8 +192,8 @@ S.append(('03 · Движки и инструменты', '', top("Этаж 03 �
   <h2 class="r" style="--i:0">Движок выбирают один раз —<br>и живут в нём годами</h2>
   <div class="cards c3 r" style="--i:1">
     <div class="card"><div class="logos">''' + ico("unrealengine") + ico("unity") + ico("godotengine") + '''</div>
-      <h4>Три закрывают 83% рынка</h4>
-      <p>Unreal — 42% разработчиков, Unity — 30%, Godot — 11%.</p></div>
+      <h4>Два движка — у 72% студий</h4>
+      <p>Unreal — 42%, Unity — 30% по опросу GDC 2026. Godot — 8–10% релизов в Steam.</p></div>
     <div class="card sage">''' + ui("layers") + '''
       <h4>Стандарт, а не фишка</h4>
       <p>Под движок нанимают людей, строят пайплайн, покупают ассеты. Сменить — значит переучить студию.</p></div>
@@ -273,8 +273,8 @@ S.append(('08 · Витрины и дистрибуция', '', top("Этаж 08
   <h2 class="r" style="--i:0">Витрина решает,<br>существует ли игра для игрока</h2>
   <div class="cards c3 r" style="--i:1">
     <div class="card"><div class="logos">''' + "".join(ico(x) for x in GATES) + '''</div>
-      <h4>Шесть ворот на весь мир</h4>
-      <p>Steam, PlayStation&nbsp;Store, Xbox, eShop, App&nbsp;Store, Google&nbsp;Play. Мимо них игры не купить.</p></div>
+      <h4>Несколько крупных витрин</h4>
+      <p>Steam, PlayStation&nbsp;Store, Xbox, eShop, App&nbsp;Store, Google&nbsp;Play — через них проходит почти весь рынок.</p></div>
     <div class="card sage">''' + ui("eye") + '''
       <h4>Внимание и привычка</h4>
       <p>Купленная библиотека не переносится. Игрок не уходит с витрины, даже если ему дают игры бесплатно.</p></div>
@@ -292,13 +292,13 @@ def grp(cap, tiles, cols, hot=False):
 S.append(('Мало игроков — ещё не горлышко', '', top("Кто стоит на карте") + '''
   <h2 class="r" style="--i:0;margin-bottom:22px">Мало игроков — ещё не горлышко.<br>Горлышко — когда их мало и заменить нельзя</h2>
   <div class="wall r" style="--i:1;grid-template-rows:repeat(2,1fr);grid-template-columns:1fr 1fr">'''
-  + grp("03 · Движки · <b>три</b> закрывают 83% рынка · <em>заменяемы</em>",
+  + grp("03 · Движки · <b>два</b> у 72% студий · <em>заменяемы</em>",
         [tile("unrealengine"), tile("unity"), tile("godotengine"), tile("valve", name="Valve · Source")], 4)
   + grp("05 · Разработка · <b>тысячи</b> студий · <em>заменяемы</em>",
         [tile("cdprojekt"), tile("rockstargames"), tile("riotgames"), tile("valve")], 4)
   + grp("06 · Издание · <b>десятки</b> · <em>заменяемы, но дорого</em>",
         [tile("sony"), tile("ubisoft"), tile("ea"), tile("squareenix")], 4)
-  + grp("08 · Витрины · <b>шесть</b> на весь мир · <em>не заменяемы</em>",
+  + grp("08 · Витрины · <b>единицы</b> крупных · <em>не заменяемы</em>",
         [tile(g, mark=True) for g in GATES], 6, hot=True)
   + '''</div>
   <p class="note after r" style="--i:2">Движков тоже мало — но с Quake можно уйти на GoldSrc. С витрины уйти некуда: без неё игры для игрока нет.</p>'''))
@@ -336,7 +336,7 @@ S.append(('Понятие горлышка', '', top("Понятие · буты
     <div class="col">
       <div class="card"><div class="kn">Признак 1</div>
         <h4>Мало игроков</h4>
-        <p>Считаем тех, к кому реально можно пойти. Сотня студий — много, шесть витрин — мало.</p></div>
+        <p>Считаем тех, к кому реально можно пойти. Сотня студий — много, несколько витрин — мало.</p></div>
       <div class="card"><div class="kn">Признак 2</div>
         <h4>Нет альтернативы</h4>
         <p>Можно заменить — больно, дорого, но можно — это не горлышко.</p></div>
@@ -350,7 +350,7 @@ S.append(('Понятие горлышка', '', top("Понятие · буты
 # ── 18 тест отказом ──────────────────────────────────────────────────────
 CH = [
     ("Откажет движок", "Берёшь другой. Valve так и сделала: ушла с Quake и собрала GoldSrc.", "Альтернатива есть", False),
-    ("Откажет подрядчик", "Меняешь. Сектор — $14,7&nbsp;млрд и сотни студий.", "Альтернатива есть", False),
+    ("Откажет подрядчик", "Меняешь. Рынок аутсорса — около $9&nbsp;млрд и сотни студий.", "Альтернатива есть", False),
     ("Откажет издатель", "Ищешь другого или идёшь без него. Игрок этого даже не заметит.", "Есть, но дорогая", False),
     ("Откажет витрина", "Игры не существует. Игрок физически не может её найти и купить.", "Альтернативы нет", True),
 ]
@@ -367,7 +367,7 @@ S.append(('Горлышко — витрина как класс', 'dark', top("
   <h2 class="r" style="--i:0">Горлышко — не Steam.<br>Горлышко — <span style="color:var(--flame)">витрина как класс</span></h2>
   <div class="figs r" style="--i:1;margin-top:38px">
     <div class="fig"><div class="n">75%</div><div class="l">выручки PC-дистрибуции у Steam — это лишь PC-проекция горлышка</div></div>
-    <div class="fig"><div class="n">6</div><div class="l">витрин в мире. Мимо них игры не существует</div></div>
+    <div class="fig"><div class="n">2–3%</div><div class="l">у GOG — третьей витрины PC. Всё, что не Steam и не Epic, — крошки</div></div>
     <div class="fig"><div class="n">8–10%</div><div class="l">у Epic, который раздаёт игры бесплатно не первый год</div></div>
   </div>
   <div class="cards c2 r" style="--i:2;margin-top:40px">
@@ -425,14 +425,22 @@ S.append(('Открытый вопрос', 'hot', top("Открытый вопр
       <h4>Горлышко — Steam</h4>
       <p>75% выручки, альтернатив практически нет.</p></div>
     <div class="card"><div class="kn">Рынок = гейминг целиком</div>
-      <h4>Горлышек шесть</h4>
-      <p>И каждое монополист в своей экосистеме.</p></div>
+      <h4>Горлышек несколько</h4>
+      <p>По одному на экосистему — и каждое монополист в своей.</p></div>
     <div class="card dark"><div class="kn">Чего мы не решили</div>
       <h4>Витрины — один этаж или три?</h4>
       <p>Не склеили ли мы три разных рынка с одинаковым последним шагом?</p></div>
   </div>'''))
 
-# ── 23 понятия ───────────────────────────────────────────────────────────
+# ── источники ────────────────────────────────────────────────────────────
+S.append(('Источники', '', top("Источники всех чисел") + '''
+  <h2 class="r" style="--i:0;margin-bottom:20px">Откуда взяты числа</h2>
+  <div class="srcwrap r" style="--i:1"><table class="src">
+    <thead><tr><th>Число</th><th>Где в деке</th><th>Источник</th></tr></thead>
+    <tbody><tr><td class="c1">Unreal 42%, Unity 30% — основной движок студий</td><td class="c2">этаж 03, карта</td><td class="c3"><a href="https://shattered.io/unreal-engine-6-unity-market-share-2026" target="_blank" rel="noopener">shattered.io</a> <span class="x">· опрос GDC 2026</span></td></tr><tr><td class="c1">Godot 8–10% релизов в Steam</td><td class="c2">этаж 03</td><td class="c3"><a href="https://shattered.io/unreal-engine-6-unity-market-share-2026" target="_blank" rel="noopener">shattered.io</a> <span class="x">· Q1 2026</span></td></tr><tr><td class="c1">Steam 74–75% PC-дистрибуции; Epic 8–10%; GOG 2–3%</td><td class="c2">горлышко</td><td class="c3"><a href="https://levvvel.com/statistics/pc-gaming" target="_blank" rel="noopener">levvvel.com</a> <span class="x">· 2025</span></td></tr><tr><td class="c1">Аутсорс ≈ $9 млрд, 2025</td><td class="c2">тест отказом</td><td class="c3"><a href="https://www.verifiedmarketreports.com/product/game-outsourcing-service-market/" target="_blank" rel="noopener">verifiedmarketreports.com</a> <span class="x">· оценки других отчётов: $4–9 млрд</span></td></tr><tr><td class="c1">Sony купила Insomniac за $229 млн, август 2019</td><td class="c2">этаж 06</td><td class="c3"><a href="https://gameworldobserver.com/2020/02/11/sony-paid-229m-insomniac-games" target="_blank" rel="noopener">gameworldobserver.com</a> <span class="x">· по отчётности Sony</span></td></tr><tr><td class="c1">Tencent: 93% Riot в 2011, 100% к концу 2015</td><td class="c2">этаж 06</td><td class="c3"><a href="https://techcrunch.com/2015/12/16/tencent-takes-full-control-of-league-of-legends-creator-riot-games/" target="_blank" rel="noopener">techcrunch.com</a></td></tr><tr><td class="c1">Cyberpunk вне PS Store 18.12.2020 — 21.06.2021; акции CD Projekt −20%</td><td class="c2">кейсы</td><td class="c3"><a href="https://www.cnbc.com/2020/12/18/sony-pulls-cyberpunk-2077-from-playstation-store-after-backlash.html" target="_blank" rel="noopener">cnbc.com</a> <span class="x">· возврат: engadget.com</span></td></tr><tr><td class="c1">Fortnite вне App Store: август 2020 — май 2025</td><td class="c2">кейсы</td><td class="c3"><a href="https://www.cnbc.com/2025/05/20/apple-fortnite-app-store-epic-games.html" target="_blank" rel="noopener">cnbc.com</a></td></tr><tr><td class="c1">Atomic Heart только в VK Play с 21.02.2023; в Steam РФ — 08.2026</td><td class="c2">кейсы</td><td class="c3"><a href="https://habr.com/ru/news/687214/" target="_blank" rel="noopener">habr.com · 4pda.to</a> <span class="x">· 4pda.to/2026/08/04/459645</span></td></tr><tr><td class="c1">Super Mario Bros. — 1985</td><td class="c2">этаж 01</td><td class="c3"><a href="https://www.nintendo.com/us/store/products/super-mario-bros-nes-nintendo-switch-online/" target="_blank" rel="noopener">nintendo.com</a></td></tr></tbody></table></div>
+  <p class="note after r" style="--i:2">Даты и суммы по Cyberpunk, Fortnite, Atomic Heart и Insomniac сверены по двум независимым публикациям каждая.</p>'''))
+
+# ── понятия ───────────────────────────────────────────────────────────
 GL = [
     ("Конкуренция", "Борьба за то, чего на всех не хватает. Всегда за что-то конкретное."),
     ("Барьер входа", "Что мешает новому игроку занять уровень. Чем выше — тем дольше держится горлышко."),
