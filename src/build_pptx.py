@@ -12,6 +12,11 @@ from pptx.dml.color import RGBColor
 from pptx.enum.shapes import MSO_SHAPE, MSO_CONNECTOR
 from pptx.enum.text import PP_ALIGN, MSO_ANCHOR
 from PIL import Image
+import sys
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+from content import (MAP, FLOORS, PLAT_VS_SHOP, VS_PAIRS, CHAIN, CHAIN_NOTE, PIPELINE,
+                     PIPELINE_NOTE, PIPELINE_ACCENT, MEASURE_FIGS, MEASURE_CARDS, MULTI,
+                     MULTI_NOTE, MULTI_SUB, FAILTEST, CASES, TERMS, SOURCES, SOURCES_NOTE)
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 ICONS = pathlib.Path(os.environ.get("PPTX_ICONS", ROOT / "src" / "pptx-icons"))
@@ -203,23 +208,13 @@ def slide_object():
         dict(kind="dark", title="Проверка: сравни\nс этажом выше", body="Объект тот же — значит, это один уровень, а не два. Если объект нельзя измерить — мы его не называем.", badge=ui_png("compare")),
     ])
 
-ROWS = [
- ("01", "Интеллектуальная\nсобственность", "Право на мир и героев: лицензии на франшизы", ["nintendo", "sega", "cdprojekt"]),
- ("02", "Концепт", "Решение о финансировании — greenlight", ["valve", "rockstargames"]),
- ("03", "Движки\nи инструменты", "Выбор студий: кто станет стандартом", ["unrealengine", "unity", "godotengine"]),
- ("04", "Компоненты\nи аутсорс", "Контракты разработчиков и издателей", ["virtuos", "room8", "keywords", "jali"]),
- ("05", "Разработка", "Выбор игроком игры — какую играть", ["cdprojekt", "rockstargames", "riotgames", "valve"]),
- ("06", "Издание\nи маркетинг", "Права на издание и релиз", ["sony", "ubisoft", "ea", "squareenix"]),
- ("07", "Платформы\nи железо", "Установленная база и эксклюзивы", ["playstation", "xbox", "nintendoswitch", "apple", "android"]),
- ("08", "Витрины\nи дистрибуция", "Аккаунт и библиотека игрока; каталог разработчиков", ["steam", "playstation", "xbox", "nintendoswitch", "appstore", "googleplay"]),
-]
 def slide_map():
     s = new_slide(); top(s, "Схема · разметка карты")
     y0 = 1.05; text(s, PAD + 0.55, y0, 2.4, 0.25, "УРОВЕНЬ", size=8.5, bold=True, color=MUTED)
     text(s, PAD + 3.05, y0, 4, 0.25, "ОБЪЕКТ КОНКУРЕНЦИИ", size=8.5, bold=True, color=MUTED)
     text(s, W - PAD - 3.6, y0, 3.6, 0.25, "КТО СТОИТ", size=8.5, bold=True, color=MUTED, align=PP_ALIGN.RIGHT)
     rh = 0.66; gap = 0.07; y = y0 + 0.32
-    for i, (no, nm, oj, logos) in enumerate(ROWS):
+    for i, (no, nm, oj, logos) in enumerate([(a, b.replace(chr(10), '\n'), c, d) for a, b, c, d in MAP]):
         neck = (no == "08")
         rect(s, PAD, y, W - 2 * PAD, rh, JET if neck else TILE, radius=0.12)
         col = FLAME if neck else MUTED
@@ -238,64 +233,30 @@ def floor(no, name, obj, title, specs, cp):
     text(s, PAD, 6.6, W - 2 * PAD, 0.6, [[("На примере Cyberpunk 2077: ", {"bold": True, "color": FLAME_INK}), cp]], size=12, color=MUTED, line=1.3)
 
 def floors():
-    floor("01", "интеллектуальная собственность", "право на мир и героев",
-          "Интеллектуальная собственность:\nправо на мир и героев",
-          [dict(kind="tile", title="Если ты не Nintendo —\nне сделаешь Mario", body="Право исключительное: у одного есть, у остальных нет. Mario 1985 года всё ещё закрывает этаж.", logos=[ico("nintendo")]),
-           dict(kind="tile", title="Барьер не денежный,\nа юридический", body="Купить нельзя, если владелец не продаёт. Но свою ИС можно создать с нуля — Half-Life, Minecraft — значит, не горлышко.", badge=ui_png("key")),
-           dict(kind="sage", title="За что конкурируют", body="За лицензии на франшизы — Marvel, Star Wars, Warhammer. Кто получил права, тот и делает игру по миру.", badge=ui_png("shield"))],
-          "CD Projekt не придумала Найт-Сити — взяла права на настольную Cyberpunk 2020 у Майка Пондсмита.")
-    floor("02", "концепт", "решение о финансировании",
-          "Концепт:\nрешение о финансировании (greenlight)",
-          [dict(kind="tile", title="Что такое концепт", body="Документ, по которому считают бюджет, сроки и риск. «Хотим RPG про киберпанк» — это ещё не он.", badge=ui_png("doc")),
-           dict(kind="sage", title="За что конкурируют", body="За решение дать денег. Внутри Rockstar концепты конкурируют за greenlight между собой; инди — за издателя или платформенный грант снаружи.", badge=ui_png("compare")),
-           dict(kind="dark", title="Риск разный —\nобъект один", body="Rockstar ставит миллиарды и 13–15 лет, инди — год и тысячи долларов. Не «низкий» и «высокий» риск, а разный масштаб одной ставки на greenlight.", badge=ui_png("layers"))],
-          "концепт Пондсмита прошёл greenlight в CD Projekt после успеха «Ведьмака 3» — на ресурсах и репутации студии.")
-    floor("03", "движки и инструменты", "выбор студий",
-          "Движки и инструменты:\nвыбор студий",
-          [dict(kind="tile", title="Два движка — у 72% студий", body="Unreal — 42%, Unity — 30% по опросу GDC 2026. Godot — 8–10% релизов в Steam. Кого выбирают студии, тот становится стандартом.", logos=[ico("unrealengine"), ico("unity"), ico("godotengine")]),
-           dict(kind="sage", title="Стандарт — следствие", body="Под движок нанимают людей, строят пайплайн, покупают ассеты. Сменить — значит переучить студию. Но можно: Valve ушла с Quake на GoldSrc.", badge=ui_png("layers")),
-           dict(kind="dark", title="Свой движок: RAGE, Source", body="Rockstar и Valve держат свои. Закрытость ценой выбора подрядчиков: этаж 03 управляет этажом 04.", logos=[ico("rockstargames", True), ico("valve", True)])],
-          "сделан на своём REDengine; в 2022-м CD Projekt объявила переход на Unreal Engine 5 — свой движок оказался заменяемым.")
-    floor("04", "компоненты и аутсорс", "контракты",
-          "Компоненты и аутсорс:\nконтракты разработчиков и издателей",
-          [dict(kind="tile", title="Сотни студий\nс узким профилем", body="Virtuos и Keywords — производство, Room 8 — арт, JALI — лицевая анимация. Конкурируют за контракты; оружие — опыт: опыт → качество → цена → срок.", logos=[ico("virtuos"), ico("room8"), ico("keywords"), ico("jali")]),
-           dict(kind="sage", title="Отбор формальный", body="Титры похожих игр, фильтр по профилю, арт-тест, пилот на реальном контенте — и только потом контракт.", badge=ui_png("compare")),
-           dict(kind="dark", title="Контрмодель: Rockstar", body="Свои студии и свой движок. Внешнего арт-аутсорса почти нет — ценой закрытости.", logos=[ico("rockstargames", True)])],
-          "собран из компонентов внешних команд — механики, лицевая анимация, звук, QA — всё разными студиями.")
-    floor("05", "разработка", "выбор игроком игры",
-          "Разработка:\nвыбор игроком игры",
-          [dict(kind="tile", title="Кто делает саму игру", body="CD Projekt RED, Rockstar North, Riot, Valve, Insomniac. Самый населённый этаж — тысячи студий.", logos=[ico("cdprojekt"), ico("rockstargames"), ico("riotgames"), ico("valve")]),
-           dict(kind="sage", title="Какую играть —\nне где покупать", body="Разработчик конкурирует за выбор игры игроком. Витрина — за то, где он её купит. Два разных объекта.", badge=ui_png("eye")),
-           dict(kind="dark", title="Заменяем", body="Студий много, профили пересекаются. Игра переживает смену разработчика — Risk of Rain пережила.", badge=ui_png("layers"))],
-          "разработчик — CD Projekt RED, около 500 человек в пике производства.")
-    floor("06", "издание и маркетинг", "права на издание",
-          "Издание:\nправа на издание и релиз",
-          [dict(kind="tile", title="Издатель ≠ разработчик", body="«Человека-паука» 2018 года сделала Insomniac — тогда независимая студия. Sony была издателем и купила её через год за $229 млн.", kn="Издатель", logos=[ico("sony"), ico("ubisoft"), ico("ea"), ico("squareenix")]),
-           dict(kind="sage", title="Холдинг — доли\nв тех, кто делает", body="Tencent взяла 93% Riot в 2011-м и весь остаток к 2015-му. Игр не делает сама.", kn="Холдинг", badge=ui_png("layers")),
-           dict(kind="dark", title="Три роли,\nтри объекта", body="На старой карте Tencent и Sony стояли на «разработке». Разработчик, издатель и холдинг конкурируют за разное.", kn="Ошибка старой карты", badge=ui_png("compare"))],
-          "у CD Projekt издатель и разработчик — разные юрлица одной группы.")
-    floor("07", "платформы и железо", "установленная база",
-          "Платформы и железо:\nустановленная база и эксклюзивы",
-          [dict(kind="tile", title="Консоли", body="Закрытые экосистемы со своими правилами и сертификацией. Конкурируют за игроков с устройством и за эксклюзивы.", logos=[ico("playstation"), ico("xbox"), ico("nintendoswitch")]),
-           dict(kind="sage", title="Мобайл", body="Самая большая аудитория — и свои ворота у каждой системы.", logos=[ico("apple"), ico("android")]),
-           dict(kind="dark", title="PC — открытая", body="Windows, Mac, Linux. Вышел на Windows и не вышел на Mac — потерял пару процентов. Платформы — данность: под них делают.", badge=ui_png("gate"))],
-          "провал запуска случился на PS4 и Xbox One — платформа определила судьбу релиза и снятие с PS Store.")
+    ICONMAP = {"key": "key", "doc": "doc", "compare": "compare", "layers": "layers",
+               "eye": "eye", "gate": "gate", "clock": "clock", "no": "no", "shield": "shield"}
+    for f in FLOORS:
+        specs = []
+        for kind, kn, title, body, icon, logos in f["cards"]:
+            sp = dict(kind=kind, title=title, body=body)
+            if kn: sp["kn"] = kn
+            if icon: sp["badge"] = ui_png(ICONMAP[icon])
+            if logos: sp["logos"] = [ico(x, on_dark=(kind == "dark")) for x in logos[:4]]
+            specs.append(sp)
+        sl = new_slide(); top(sl, f["pill"]); h2(sl, f["title"])
+        cards3(sl, specs, y=2.35, h=4.1)
+        if f["no"] == "08":
+            text(sl, PAD, 6.6, W - 2 * PAD, 0.6,
+                 PLAT_VS_SHOP.replace("<b>", "").replace("</b>", ""), size=12, color=MUTED, line=1.3)
+        else:
+            text(sl, PAD, 6.6, W - 2 * PAD, 0.6,
+                 [[("На примере Cyberpunk 2077: ", {"bold": True, "color": FLAME_INK}), f["cp"]]],
+                 size=12, color=MUTED, line=1.3)
 
-def slide_showcase():
-    s = new_slide(); top(s, "Этаж 08 · витрины и дистрибуция")
-    h2(s, "Витрины и дистрибуция:\nаккаунт и библиотека игрока")
-    cards3(s, [
-        dict(kind="tile", title="Что такое витрина", body="Платформа, которая владеет аккаунтом игрока: библиотекой, платежами, рекомендациями. Steam, PlayStation Store, Xbox, eShop, App Store, Google Play.",
-             logos=[ico("steam"), ico("playstation"), ico("xbox"), ico("appstore"), ico("googleplay")]),
-        dict(kind="sage", title="За что конкурируют витрины", body="За аккаунт с библиотекой — он создаёт издержки переключения. За эксклюзивы: CS, Dota, Half-Life только в Steam. За каталог разработчиков — комиссией 30% против 12%.", badge=ui_png("key")),
-        dict(kind="hot", title="Почему горлышко", body="Готовая игра не доходит до игрока иначе как через одну из немногих таких платформ, и каждая контролирует свою экосистему. Внимание и привычка — следствие, а не объект.", badge=ui_png("gate")),
-    ], y=2.35, h=4.1)
-    text(s, PAD, 6.6, W - 2 * PAD, 0.5, [[("На примере Cyberpunk 2077: ", {"bold": True, "color": FLAME_INK}), "снята с PlayStation Store 18.12.2020 с полным возвратом денег, вернулась 21.06.2021."]], size=12, color=MUTED)
 
 def slide_chain():
     s = new_slide(); top(s, "Этаж 08 · цепочка удержания"); h2(s, "Как время игрока превращается\nв издержки переключения")
-    steps = [("Время\nна платформе", "ресурс, не объект"), ("Покупки", "витрина берёт комиссию"), ("Библиотека", "не переносится"),
-             ("Друзья, достижения,\nотзывы", "живут только здесь"), ("Издержки\nпереключения", "уйти = бросить всё"), ("LTV игрока", "деньги дальше по цепочке")]
+    steps = CHAIN
     n = len(steps); gap = 0.22; w = (W - 2 * PAD - gap * (n - 1)) / n; y = 2.7; h = 2.2
     for i, (t, sub) in enumerate(steps):
         x = PAD + i * (w + gap); last = i == n - 1
@@ -305,15 +266,11 @@ def slide_chain():
         if not last:
             a = s.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, Inches(x + w + 0.02), Inches(y + h / 2 - 0.1), Inches(gap - 0.04), Inches(0.2))
             a.fill.solid(); a.fill.fore_color.rgb = FLAME; a.line.fill.background()
-    text(s, PAD, 5.35, W - 2 * PAD, 1.2,
-         [["Отзывы в Steam — артефакт доверия, которого нет у Epic в таком виде: чем больше игроков, тем качественнее отзывы, тем выше готовность покупать и рисковать. Достижения не переносятся, друзья для онлайна — только через платформу. Всё это и есть удержание."]],
-         size=13, color=MUTED, line=1.35)
-    note(s, "Правило: время — ресурс, который конвертируется в удержание. Объектом мы называем то, что накапливается и удерживается, — библиотеку и аккаунт.")
+    note(s, CHAIN_NOTE, y=5.5)
 
 def slide_pipeline():
     s = new_slide(); top(s, "Этаж 08 · зависимость разработчика"); h2(s, "Что нужно разработчику,\nчтобы игра появилась на витрине")
-    steps = [("Сертификация", "техтребования каждой платформы; блокер"), ("Комиссия", "Steam 30% · Epic 12%\nApp Store, Google Play 30% (15% малому бизнесу)\nконсоли ≈30%, условия под NDA"),
-             ("Отдельный билд", "под каждую платформу; порт — отдельный бюджет"), ("Возрастной рейтинг", "ESRB, PEGI, USK; без него — не на консоль"), ("Правила контента", "модерация витрины; отказ = нет релиза")]
+    steps = PIPELINE
     n = len(steps); gap = 0.2; w = (W - 2 * PAD - gap * (n - 1)) / n; y = 2.6; h = 3.0
     for i, (t, sub) in enumerate(steps):
         x = PAD + i * (w + gap)
@@ -321,21 +278,20 @@ def slide_pipeline():
         text(s, x + 0.2, y + 0.22, 0.6, 0.4, f"{i+1}", size=20, bold=True, color=FLAME)
         text(s, x + 0.2, y + 0.75, w - 0.4, 0.55, t, size=15, bold=True, color=INK, line=1.08)
         text(s, x + 0.2, y + 1.35, w - 0.4, h - 1.55, sub, size=11.5, color=MUTED, line=1.3)
-    note(s, "Каждый шаг — отдельные ворота со своей ценой, и условия диктует витрина. Быть на всех витринах дорого — и это работает на тезис о горлышке.", y=5.85)
-    text(s, PAD, 6.5, W - 2 * PAD, 0.5, "Роялти Unreal — 5% после $1 млн, но 0% при продаже в Epic Games Store: витрина Epic субсидируется движком Epic.", size=12, color=FLAME_INK, bold=True)
+    note(s, PIPELINE_NOTE, y=5.85)
+    text(s, PAD, 6.5, W - 2 * PAD, 0.5, PIPELINE_ACCENT, size=12, color=FLAME_INK, bold=True)
 
 def slide_measure():
     s = new_slide(JET); top(s, "Этаж 08 · измеримость объекта", dark=True)
     h2(s, "Если объект нельзя измерить —\nмы его не называем", color=PAPER_ON_DARK)
-    figs = [("147 млн", "ежемесячных активных игроков Steam, 2025"), ("42 млн", "рекордный одновременный онлайн Steam, март 2026"), ("295 млн", "аккаунтов в Epic Games Store при 8–10% доли")]
+    figs = MEASURE_FIGS
     w = (W - 2 * PAD) / 3
     for i, (n, l) in enumerate(figs):
         x = PAD + i * w
         text(s, x, 2.7, w - 0.4, 1.0, n, size=54, bold=True, color=FLAME, line=0.95)
         text(s, x, 3.75, w - 0.5, 0.8, l, size=12.5, color=C("B8B3A7"), line=1.3)
         if i: s.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Inches(x - 0.2), Inches(2.75), Inches(x - 0.2), Inches(4.4)).line.color.rgb = C("3A372F")
-    for i, (t, b) in enumerate([("Что измеряем", "MAU и одновременный онлайн — размер аккаунтной базы; размер библиотек и вишлистов — накопленное удержание; число и объём отзывов — доверие."),
-                                 ("Чего пока нет", "Публичного размера библиотек и вишлистов по платформам. Пока не измерили — не заявляем как объект; это открытая задача.")]):
+    for i, (t, b) in enumerate(MEASURE_CARDS):
         x = PAD + i * ((W - 2 * PAD) / 2 + 0.1); w2 = (W - 2 * PAD) / 2 - 0.1
         rect(s, x, 4.85, w2, 1.65, C("232119"), radius=0.14)
         text(s, x + 0.28, 5.05, w2 - 0.56, 0.4, t, size=15, bold=True, color=PAPER_ON_DARK)
@@ -343,8 +299,7 @@ def slide_measure():
 
 def slide_multi():
     s = new_slide(); top(s, "Кто стоит на нескольких этажах"); h2(s, "Позиция на одном этаже —\nрычаг на другом")
-    groups = [("Valve", [("03 · Движок", "valve", "Source"), ("05 · Разработка", "valve", "Half-Life, CS, Dota"), ("08 · Витрина", "steam", "Steam — 75% PC")]),
-              ("Epic Games", [("03 · Движок", "unrealengine", "Unreal — 42% студий"), ("05 · Разработка", "epicgames", "Fortnite"), ("08 · Витрина", "epicgames", "EGS — 8–10%")])]
+    groups = MULTI
     gw = (W - 2 * PAD - 0.25) / 2
     for gi, (name, items) in enumerate(groups):
         gx = PAD + gi * (gw + 0.25); rect(s, gx, 2.45, gw, 2.75, PAPER2, radius=0.16)
@@ -355,17 +310,13 @@ def slide_multi():
             pic(s, ico(slug), tx + tw / 2 - 0.42, 3.22, 0.84, 0.84)
             text(s, tx + 0.12, 4.15, tw - 0.24, 0.3, lab, size=9, bold=True, color=FLAME_INK, align=PP_ALIGN.CENTER, caps=True)
             text(s, tx + 0.12, 4.45, tw - 0.24, 0.5, sub, size=10.5, color=MUTED, align=PP_ALIGN.CENTER, line=1.2)
-    text(s, PAD, 5.4, W - 2 * PAD, 1.2,
-         [["Доля витрины у Epic — 8–10%, но 42% студий делают игры на его движке. Сила на этаже 03 финансирует борьбу на этаже 08: эксклюзивы, бесплатные раздачи, комиссия 12%, 0% роялти в своём магазине. Valorant сделан Riot на Unreal — Epic получает роялти с чужого хита. Доля на одном этаже — не мера силы компании."]],
-         size=13, color=MUTED, line=1.35)
-    note(s, "Гипотеза Владимира к проверке: ценность магазина для Epic — не выручка, а доверие игроков и разработчиков к экосистеме Unreal.")
+    text(s, PAD, 5.4, W - 2 * PAD, 1.2, MULTI_NOTE, size=13, color=MUTED, line=1.35)
+    note(s, MULTI_SUB)
 
 def slide_vs():
     s = new_slide(); top(s, "Проверка · объекты различаются"); h2(s, "Объекты соседних этажей\nне совпадают")
-    pairs = [("03 · Движки", "выбор студий: раз выбрали — живут годами", "04 · Аутсорс", "контракты: торгуются заново на каждом проекте"),
-             ("05 · Разработка", "какую игру выберет игрок", "06 · Издание", "права на издание и релиз — не про игрока"),
-             ("07 · Платформа", "установленная база: у кого есть устройство", "08 · Витрина", "аккаунт и библиотека: где игрок живёт")]
-    y = 2.5; h = 1.25
+    pairs = VS_PAIRS
+    y = 2.35; h = 0.86
     for a, at, b, bt in pairs:
         rect(s, PAD, y, W - 2 * PAD, h, TILE, radius=0.14)
         half = (W - 2 * PAD - 0.8) / 2
@@ -374,7 +325,7 @@ def slide_vs():
             text(s, x, y + 0.22, half - 0.2, 0.3, lab, size=9.5, bold=True, color=MUTED, caps=True)
             text(s, x, y + 0.55, half - 0.2, 0.6, t, size=14, bold=True, color=INK, line=1.15)
         text(s, PAD + 0.3 + half, y, 0.8, h, "≠", size=28, bold=True, color=FLAME, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
-        y += h + 0.18
+        y += h + 0.12
 
 def slide_neck_def():
     s = new_slide(); top(s, "Понятие · бутылочное горлышко"); h2(s, "Уровень, где мало игроков,\nа зависят от них все")
@@ -405,10 +356,7 @@ def slide_neck_def():
 
 def slide_failtest():
     s = new_slide(); top(s, "Цепочка зависимостей · тест отказом"); h2(s, "Тест отказом\nпо четырём уровням")
-    items = [("Откажет движок", "Берёшь другой. Valve ушла с Quake и собрала GoldSrc; CD Projekt уходит с REDengine на Unreal.", "Альтернатива есть", False),
-             ("Откажет подрядчик", "Меняешь. Рынок аутсорса — около $9 млрд и сотни студий.", "Альтернатива есть", False),
-             ("Откажет издатель", "Ищешь другого или идёшь без него. Игрок этого даже не заметит.", "Есть, но дорогая", False),
-             ("Откажет витрина", "Игры не существует. Игрок физически не может её найти и купить.", "Альтернативы нет", True)]
+    items = FAILTEST
     gap = 0.2; w = (W - 2 * PAD - 3 * gap) / 4; y = 2.5; h = 3.8
     for i, (t, b, v, dead) in enumerate(items):
         x = PAD + i * (w + gap); rect(s, x, y, w, h, JET if dead else TILE, radius=0.16)
@@ -435,10 +383,8 @@ def slide_class():
 
 def slide_cases():
     s = new_slide(); top(s, "Горлышко · проверенные случаи"); h2(s, "Три случая отключения\nигры витриной")
-    cases = [("playstation", "Cyberpunk 2077", "6 месяцев вне PS Store", "Sony убрала игру 18.12.2020 и вернула деньги всем. Вернулась 21.06.2021. Акции CD Projekt — минус 20% за день."),
-             ("apple", "Fortnite", "почти 5 лет вне App Store", "Apple удалила игру в августе 2020-го. Вернулась в американский App Store в мае 2025-го. Пять лет игры не существовало для iOS."),
-             ("vk", "Atomic Heart", "только VK Play в РФ и СНГ", "На релизе 21.02.2023 страница в Steam была недоступна в регионе. В российском Steam — только в августе 2026-го.")]
-    cards3(s, [dict(kind="tile", title=t, body=b, kn=sub, badge=ico(sl)) for sl, t, sub, b in cases], y=2.45, h=3.95)
+    cases = CASES
+    cards3(s, [dict(kind="tile", title=t, body=b + "  " + k, kn=sub, badge=ico(sl)) for sl, t, sub, b, k in cases], y=2.45, h=3.95)
     note(s, "Игра была готова и куплена. Отказал только уровень витрины — и этого хватило.")
 
 def slide_hidden():
@@ -459,23 +405,7 @@ def slide_open():
         text(s, x + 0.28, y + 0.6, cw - 0.56, 0.45, t, size=18, bold=True, color=INK)
         text(s, x + 0.28, y + 1.1, cw - 0.56, 0.7, b, size=13, color=MUTED, line=1.3)
 
-SRC = [
- ("Unreal 42%, Unity 30% — основной движок студий (опрос GDC 2026); Godot 8–10% релизов Steam", "этаж 03", "shattered.io", "https://shattered.io/unreal-engine-6-unity-market-share-2026"),
- ("Steam 74–75% PC-дистрибуции; Epic 8–10%; GOG 2–3%; 147 млн MAU; пик 42 млн", "этаж 08, горлышко", "levvvel.com", "https://levvvel.com/statistics/pc-gaming"),
- ("Комиссии: Steam 30%, Epic 12%; с 06.2025 у Epic 0% на первый $1 млн в год", "пайплайн витрины", "shattered.io", "https://shattered.io/steam-vs-epic-games-store/"),
- ("Epic Games Store: 295 млн аккаунтов, $1,09 млрд трат за год", "измеримость", "shattered.io", "https://shattered.io/epic-games-store-revenue-2026/"),
- ("Роялти Unreal 5% после $1 млн; 0% при продаже в Epic Games Store", "рычаг Epic", "unrealengine.com", "https://www.unrealengine.com/license"),
- ("App Store 30%, 15% для малого бизнеса", "пайплайн витрины", "developer.apple.com", "https://developer.apple.com/app-store/small-business-program/"),
- ("Google Play 30%, 15% на первый $1 млн", "пайплайн витрины", "support.google.com", "https://support.google.com/googleplay/android-developer/answer/112622"),
- ("CD Projekt: переход с REDengine на Unreal Engine 5, март 2022", "этаж 03, тест отказом", "cdprojekt.com", "https://www.cdprojekt.com/en/media/news/new-witcher-saga-announced-cd-projekt-red-begins-development-on-unreal-engine-5-as-part-of-a-strategic-partnership-with-epic-games/"),
- ("Аутсорс ≈ $9 млрд, 2025 (другие отчёты: $4–9 млрд)", "тест отказом", "verifiedmarketreports.com", "https://www.verifiedmarketreports.com/product/game-outsourcing-service-market/"),
- ("Sony купила Insomniac за $229 млн, август 2019", "этаж 06", "gameworldobserver.com", "https://gameworldobserver.com/2020/02/11/sony-paid-229m-insomniac-games"),
- ("Tencent: 93% Riot в 2011, 100% к концу 2015", "этаж 06", "techcrunch.com", "https://techcrunch.com/2015/12/16/tencent-takes-full-control-of-league-of-legends-creator-riot-games/"),
- ("Cyberpunk вне PS Store 18.12.2020 — 21.06.2021; акции CD Projekt −20%", "кейсы", "cnbc.com", "https://www.cnbc.com/2020/12/18/sony-pulls-cyberpunk-2077-from-playstation-store-after-backlash.html"),
- ("Fortnite вне App Store: август 2020 — май 2025", "кейсы", "cnbc.com", "https://www.cnbc.com/2025/05/20/apple-fortnite-app-store-epic-games.html"),
- ("Atomic Heart только в VK Play с 21.02.2023; в Steam РФ — 08.2026", "кейсы", "habr.com", "https://habr.com/ru/news/687214/"),
- ("Super Mario Bros. — 1985", "этаж 01", "nintendo.com", "https://www.nintendo.com/us/store/products/super-mario-bros-nes-nintendo-switch-online/"),
-]
+SRC = SOURCES
 def slide_sources():
     s = new_slide(); top(s, "Источники всех чисел"); h2(s, "Откуда взяты числа", size=30)
     rows = len(SRC) + 1; tb = s.shapes.add_table(rows, 3, Inches(PAD), Inches(1.95), Inches(W - 2 * PAD), Inches(4.9)).table
@@ -489,13 +419,11 @@ def slide_sources():
     for c, hdr in enumerate(("ЧИСЛО", "ГДЕ В ДЕКЕ", "ИСТОЧНИК")): cell(0, c, hdr, 8.5, True, MUTED)
     for r, (n, w, dom, url) in enumerate(SRC, 1):
         cell(r, 0, n, 10, True); cell(r, 1, w, 10, False, MUTED); cell(r, 2, dom, 10, True, FLAME_INK, url)
-    note(s, "Консольные комиссии (≈30%) платформы публично не раскрывают — указаны как оценка, без ссылки.", y=6.95)
+    note(s, SOURCES_NOTE, y=6.9)
 
 def slide_terms():
     s = new_slide(); top(s, "Понятия такта 2"); h2(s, "Понятия, которыми пользовались", size=30)
-    gl = [("Конкуренция", "Борьба за то, чего на всех не хватает. Всегда за что-то конкретное."), ("Барьер входа", "Что мешает новому игроку занять уровень. Чем выше — тем дольше держится горлышко."),
-          ("Объект конкуренции", "То, обладание которым даёт преимущество. На каждом этаже свой. Если нельзя измерить — не называем."), ("Зависимость в цепочке", "Насколько жёстко уровень нуждается в соседнем. Меряется отказом."),
-          ("Бутылочное горлышко", "Уровень, где мало игроков, а зависят от них все."), ("Уровень", "Место, где есть свой объект конкуренции. Не шаг процесса.")]
+    gl = TERMS
     w = (W - 2 * PAD - 0.2) / 2; h = 1.35
     for i, (t, b) in enumerate(gl):
         x = PAD + (i % 2) * (w + 0.2); y = 2.0 + (i // 2) * (h + 0.15)
@@ -505,7 +433,7 @@ def slide_terms():
 
 # ── порядок ────────────────────────────────────────────────────────────────
 cover(); slide_gamedev(); slide_object(); section("01", "Карта\nуровней", "Восемь этажей, на каждом свой объект конкуренции.")
-slide_map(); floors(); slide_showcase(); slide_chain(); slide_pipeline(); slide_measure(); slide_multi(); slide_vs()
+slide_map(); floors(); slide_chain(); slide_pipeline(); slide_measure(); slide_multi(); slide_vs()
 section("02", "Бутылочное\nгорлышко", "Ищем его тестом отказом, а не по деньгам на этаже.")
 slide_neck_def(); slide_failtest(); slide_class(); slide_cases(); slide_hidden(); slide_open(); slide_sources(); slide_terms()
 

@@ -129,6 +129,11 @@ b{font-weight:700}
 .wallgrp.hot .cap em{color:var(--ink)}
 .wallgrp .grid{display:grid;gap:9px;flex:1;min-height:0}
 
+/* ============ платформа против витрины ============ */
+.pvs{background:var(--tile);border-radius:16px;padding:22px 28px;margin-top:18px;
+     font-size:21px;line-height:1.4;color:var(--muted)}
+.pvs b{color:var(--ink);font-weight:700}
+
 /* ============ смысловые иконки ============ */
 /* иконка — иллюстрация в круглом бейдже, а не буллит */
 .badge{width:176px;height:176px;border-radius:50%;background:var(--paper-2);display:grid;
@@ -143,14 +148,14 @@ b{font-weight:700}
 .ui.big{width:76px;height:76px;stroke-width:1.9}
 
 /* ============ сравнение двух этажей ============ */
-.vs{display:grid;grid-template-columns:1fr 54px 1fr;align-items:stretch;gap:0;
-    background:var(--tile);border-radius:16px;padding:24px 26px}
+.vs{display:grid;grid-template-columns:1fr 48px 1fr;align-items:stretch;gap:0;
+    background:var(--tile);border-radius:14px;padding:15px 24px}
 .vs .side{display:flex;flex-direction:column;justify-content:center}
-.vs .side .lb{font-size:14.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
-    color:var(--muted);margin-bottom:10px}
-.vs .side .tx{font-size:23px;line-height:1.32;font-weight:600}
+.vs .side .lb{font-size:12.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+    color:var(--muted);margin-bottom:6px}
+.vs .side .tx{font-size:19px;line-height:1.28;font-weight:600}
 .vs .side .tx em{font-style:normal;color:var(--flame-ink)}
-.vs .mid{display:flex;align-items:center;justify-content:center;font-size:30px;
+.vs .mid{display:flex;align-items:center;justify-content:center;font-size:24px;
     font-weight:900;color:var(--flame)}
 
 /* ============ стена логотипов: группы как отдельные панели ============ */
@@ -161,6 +166,7 @@ b{font-weight:700}
 
 /* ============ карточки ============ */
 .cards{display:grid;gap:15px}
+.cards > *{min-width:0}
 /* только прямой потомок слайда растёт: вложенные сетки остаются по контенту */
 .s > .cards{flex:1;min-height:0}
 /* карточки не растягиваются на всю высоту: короткий текст в высокой карточке
@@ -172,6 +178,11 @@ b{font-weight:700}
 .s > .cards > .card{min-height:0}
 /* якорь карточки (иконка, метка, ряд логотипов) держится сверху, текст уходит вниз —
    карточка заполняет ряд без пустот посередине */
+/* якорь карточки — один блок сверху, текст прижат к низу */
+.card > .anchor{margin-bottom:auto}
+.card > .anchor > .kn{margin-bottom:14px}
+.card > .anchor > .logos + .kn,.card > .anchor > .badge + .kn{margin-top:14px;margin-bottom:0}
+.card.mid > .anchor{margin-bottom:22px}
 .card > .badge,.card > .kn,.card > .logos{margin-bottom:auto}
 .card.mid{justify-content:center}
 .card.mid > .badge,.card.mid > .kn,.card.mid > .logos{margin-bottom:22px}
@@ -189,7 +200,7 @@ img.ic{width:auto!important;object-fit:contain;display:block}
 .c2{grid-template-columns:1fr 1fr}
 .c3{grid-template-columns:repeat(3,1fr)}
 .c4{grid-template-columns:repeat(4,1fr)}
-.card{background:var(--tile);border-radius:16px;padding:28px 30px;display:flex;flex-direction:column}
+.card{background:var(--tile);border-radius:16px;padding:28px 30px;display:flex;flex-direction:column;min-width:0}
 .card.sage{background:var(--sage)}
 .card.dark{background:var(--jet);color:var(--paper)}
 .card.dark .mut{color:rgba(241,236,227,.7)}

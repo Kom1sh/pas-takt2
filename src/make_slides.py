@@ -4,7 +4,8 @@
 Логотипы описаны данными, а не разметкой: плиток много и руками они разъезжаются.
 Правится этот файл, затем `python3 src/make_slides.py && python3 src/build.py`.
 """
-import pathlib, json
+import pathlib, json, sys
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 RASTER = json.load(open(pathlib.Path(__file__).resolve().parent / "raster.json"))
 
 INK = "#16140F"
@@ -86,18 +87,36 @@ def top(pill):
     return '<div class="top"><span class="pill">%s</span><span class="cnt"></span></div>' % pill
 
 
+import math
+from content import (MAP, FLOORS, PLAT_VS_SHOP, VS_PAIRS, CHAIN, CHAIN_NOTE,
+                     PIPELINE, PIPELINE_NOTE, PIPELINE_ACCENT, MEASURE_FIGS, MEASURE_CARDS,
+                     MULTI, MULTI_NOTE, MULTI_SUB, FAILTEST, CASES, TERMS, SOURCES,
+                     SOURCES_NOTE, GATES, OUTS)
+
 FUNNEL = ('<div class="fn"><div class="cap">ЭТАЖИ 01–07</div><div class="cone">'
-          + "".join('<i style="top:%.2f%%"></i>' % (b*100/7.0) for b in range(1,7))
+          + "".join('<i style="top:%.2f%%"></i>' % (b * 100 / 7.0) for b in range(1, 7))
           + '</div><div class="neck"><b>08</b><s>ВИТРИНА</s></div>'
             '<div class="arw"></div><div class="out">ИГРОК</div></div>')
 
-GATES = ["steam", "playstation", "xbox", "nintendoswitch", "appstore", "googleplay"]
-OUTS  = ["virtuos", "room8", "keywords", "jali", "wolf3d"]
+def nl(t):
+    return t.replace("\n", "<br>")
+
+def anchor(icon, logos, kn):
+    inner = ""
+    if logos:
+        inner += '<div class="logos">' + "".join(ico(x) for x in logos) + "</div>"
+    if icon:
+        inner += ui(icon)
+    if kn:
+        inner += '<div class="kn">%s</div>' % kn
+    return '<div class="anchor">%s</div>' % inner if inner else ""
+
+def card(kind, kn, title, body, icon=None, logos=None):
+    return ('<div class="card %s">%s<h4>%s</h4><p>%s</p></div>'
+            % (kind, anchor(icon, logos, kn), nl(title), body))
 
 S = []
-import math
 
-# ── 01 обложка ───────────────────────────────────────────────────────────
 rays = ('<svg class="rays" viewBox="0 0 200 200" fill="none" stroke="rgba(22,20,15,.34)" stroke-width=".7">'
         + "".join('<line x1="100" y1="100" x2="%.1f" y2="%.1f"/>'
                   % (100 + 150 * math.cos(a * math.pi / 24), 100 + 150 * math.sin(a * math.pi / 24))
@@ -110,356 +129,181 @@ S.append(('Геймдев · Такт 2', 'hot cover', rays + top("ПАС · И�
   <div class="meta-b r" style="--i:2"><span>Разбираем на Cyberpunk 2077</span>
     <span>8 этажей · 1 горлышко</span></div>'''))
 
-# ── 02 что такое геймдев ─────────────────────────────────────────────────
 S.append(('Что такое геймдев', '', top("Определение") + '''
   <h2 class="r" style="--i:0">Что такое геймдев</h2>
   <div class="cards r" style="--i:1;grid-template-columns:1.5fr 1fr">
-    <div class="card mid">''' + ui("play") + '''
+    <div class="card mid">''' + '<div class="anchor">' + ui("play") + '</div>' + '''
       <p style="font-size:25px;line-height:1.42;color:var(--ink);max-width:none">Программные интерактивные системы, в которых пользователь <b>добровольно действует в рамках искусственных правил</b>, а система непрерывно отвечает на его действия, — с доведением продукта и его поддержки до аудитории <b>через цифровые площадки дистрибуции</b>.</p></div>
-    <div class="card dark mid">''' + ui("no") + '''
-      <h4>Не геймдев</h4>
-      <p>Веб-дизайн, тренажёры и обучающие симуляторы, классические приложения, розничная продажа игр, настольные игры.</p></div>
+    ''' + card("dark mid", None, "Не геймдев",
+               "Веб-дизайн, тренажёры и обучающие симуляторы, классические приложения, розничная продажа игр, настольные игры.", "no") + '''
   </div>'''))
 
-# ── 03 объект конкуренции ────────────────────────────────────────────────
 S.append(('Объект конкуренции', '', top("Понятие") + '''
   <h2 class="r" style="--i:0">Объект конкуренции — то,<br>обладание которым даёт преимущество</h2>
-  <div class="cards c3 r" style="--i:1">
-    <div class="card">''' + ui("key") + '''
-      <h4>Право, стандарт,<br>опыт, внимание</h4>
-      <p>Это можно удерживать. А пока удерживаешь — другим сюда хода нет.</p></div>
-    <div class="card sage">''' + ui("nomoney") + '''
-      <h4>Но не деньги<br>и не доля рынка</h4>
-      <p>Это ресурс на входе и следствие на выходе. За них не дерутся — их получают.</p></div>
-    <div class="card dark">''' + ui("compare") + '''
-      <h4>Проверка: сравни<br>с этажом выше</h4>
-      <p>Объект тот же — значит, это один уровень, а не два.</p></div>
-  </div>'''))
+  <div class="cards c3 r" style="--i:1">'''
+  + card("tile", None, "Право, стандарт,\nопыт, внимание", "Это можно удерживать. А пока удерживаешь — другим сюда хода нет.", "key")
+  + card("sage", None, "Но не деньги\nи не доля рынка", "Это ресурс на входе и следствие на выходе. За них не дерутся — их получают.", "nomoney")
+  + card("dark", None, "Проверка: сравни\nс этажом выше", "Объект тот же — значит, это один уровень, а не два. Если объект нельзя измерить — мы его не называем.", "compare")
+  + '</div>'))
 
-# ── 04 раздел 01 ─────────────────────────────────────────────────────────
 S.append(('Раздел 01 — карта', 'dark sec', '<div class="huge">01</div>' + top("Раздел 01") + '''
   <h1 class="r" style="--i:0">Карта<br>уровней</h1>
   <p class="note r" style="--i:1">Восемь этажей, на каждом свой объект конкуренции.</p>'''))
 
-# ── 05 карта ─────────────────────────────────────────────────────────────
 S.append(('Карта уровней', '', top("Схема · разметка карты") + '''
   <div class="maphead"><span></span><span>Уровень</span><span>Объект конкуренции</span><span>Кто стоит</span></div>
   <div class="map">'''
-  + row("01", "Интеллектуальная<br>собственность", "Право делать этот мир и этих героев", ["nintendo", "sega", "cdprojekt"], "")
-  + row("02", "Концепт", "Снижение риска до вложений", ["valve", "rockstargames"], "")
-  + row("03", "Движки<br>и инструменты", "Производственный стандарт", ["unrealengine", "unity", "godotengine"], "")
-  + row("04", "Компоненты<br>и аутсорс", "Опыт, обменянный на срок и цену", ["virtuos", "room8", "keywords", "jali"], "")
-  + row("05", "Разработка", "Игровой опыт", ["cdprojekt", "rockstargames", "riotgames", "valve"], "")
-  + row("06", "Издание<br>и маркетинг", "Права на издание и релиз", ["sony", "ubisoft", "ea", "squareenix"], "")
-  + row("07", "Платформы<br>и железо", "Доступность", ["playstation", "xbox", "nintendoswitch", "apple", "android"], "")
-  + row("08", "Витрины<br>и дистрибуция", "Внимание и привычка игрока", GATES, "", neck=True)
+  + "".join(row(no, nl(nm), oj, logos, "", neck=(no == "08")) for no, nm, oj, logos in MAP)
   + '</div>'))
 
-# ── 06 этаж 01 ───────────────────────────────────────────────────────────
-S.append(('01 · Интеллектуальная собственность', '', top("Этаж 01 · интеллектуальная собственность") + '''
-  <h2 class="r" style="--i:0">Интеллектуальная собственность:<br>право на мир и героев</h2>
-  <div class="cards c3 r" style="--i:1">
-    <div class="card">''' + brand("nintendo") + '''
-      <h4>Если ты не Nintendo —<br>не сделаешь Mario</h4>
-      <p>Право исключительное: у одного есть, у остальных нет. Mario 1985 года всё ещё закрывает этаж.</p></div>
-    <div class="card">''' + ui("key") + '''
-      <h4>Барьер не денежный,<br>а юридический</h4>
-      <p>Купить нельзя, если владелец не продаёт. И живёт это право десятилетиями.</p></div>
-    <div class="card sage">''' + brand("cdprojekt") + '''
-      <h4>Cyberpunk 2077:<br>права у Пондсмита</h4>
-      <p>CD&nbsp;Projekt не придумала Найт-Сити — взяла права у Майка Пондсмита.</p></div>
-  </div>
-  <p class="note after r" style="--i:2">Но горлышком этаж не является: зависят <b>не все</b>. Свою ИС можно создать с нуля — так появились Half-Life и Minecraft.</p>'''))
+for f in FLOORS:
+    body = (top(f["pill"]) + '\n  <h2 class="r" style="--i:0">%s</h2>\n' % nl(f["title"])
+            + '  <div class="cards c3 r" style="--i:1">'
+            + "".join(card(k, kn, t, b, ic, lg) for k, kn, t, b, ic, lg in f["cards"])
+            + '</div>\n')
+    if f["no"] == "08":
+        body += '  <div class="pvs r" style="--i:2">%s</div>\n' % PLAT_VS_SHOP
+    else:
+        body += ('  <p class="note after r" style="--i:2"><b style="color:var(--flame-ink)">'
+                 'На примере Cyberpunk 2077:</b> %s</p>\n' % f["cp"])
+    S.append(("%s · %s" % (f["no"], f["title"].split(":")[0]), '', body))
 
-# ── 07 этаж 02 ───────────────────────────────────────────────────────────
-S.append(('02 · Концепт', '', top("Этаж 02 · концепт · новый уровень") + '''
-  <h2 class="r" style="--i:0">Концепт:<br>снижение риска до вложений</h2>
-  <div class="cards c3 r" style="--i:1">
-    <div class="card">''' + ui("doc") + '''
-      <h4>Что такое концепт</h4>
-      <p>Документ, по которому считают бюджет и сроки. «Хотим RPG про киберпанк» — это ещё не он.</p></div>
-    <div class="card">''' + ui("shield") + '''
-      <h4>За что платят</h4>
-      <p>За то, чтобы не потратить три года впустую. Аналитика, креативная дирекция, проверка концепта.</p></div>
-    <div class="card dark">''' + ui("layers") + '''
-      <h4>Пондсмит стоит<br>на двух этажах</h4>
-      <p>Владелец прав и внешний носитель концепта: он в титрах Cyberpunk в дизайн-документах и сюжете.</p></div>
-  </div>
-  <p class="note after r" style="--i:2">Один участник закрывает два этажа сразу — это и доказывает, что этажи не шаги пайплайна.</p>'''))
+S.append(('Цепочка удержания', '', top("Этаж 08 · цепочка удержания") + '''
+  <h2 class="r" style="--i:0;margin-bottom:24px">Как время игрока превращается<br>в его пожизненную ценность</h2>
+  <div class="cards r" style="--i:1;grid-template-columns:repeat(6,1fr);gap:12px">'''
+  + "".join('<div class="card%s"><h4 style="font-size:20px">%s</h4><p style="font-size:16px">%s</p></div>'
+            % (" hot" if i == len(CHAIN) - 1 else "", nl(t), sub) for i, (t, sub) in enumerate(CHAIN))
+  + '</div>\n  <p class="note after r" style="--i:2">%s</p>' % CHAIN_NOTE))
 
-# ── 08 этаж 03 ───────────────────────────────────────────────────────────
-S.append(('03 · Движки и инструменты', '', top("Этаж 03 · движки и инструменты") + '''
-  <h2 class="r" style="--i:0">Движки и инструменты:<br>производственный стандарт</h2>
-  <div class="cards c3 r" style="--i:1">
-    <div class="card"><div class="logos">''' + ico("unrealengine") + ico("unity") + ico("godotengine") + '''</div>
-      <h4>Два движка — у 72% студий</h4>
-      <p>Unreal — 42%, Unity — 30% по опросу GDC 2026. Godot — 8–10% релизов в Steam.</p></div>
-    <div class="card sage">''' + ui("layers") + '''
-      <h4>Стандарт, а не фишка</h4>
-      <p>Под движок нанимают людей, строят пайплайн, покупают ассеты. Сменить — значит переучить студию.</p></div>
-    <div class="card dark"><div class="logos">''' + ico("rockstargames") + ico("valve") + '''</div>
-      <h4>Свой движок: RAGE, Source</h4>
-      <p>RAGE у Rockstar, Source у Valve. Закрытость ценой выбора подрядчиков.</p></div>
-  </div>
-  <p class="note after r" style="--i:2">Заменяем: Valve ушла с Quake и собрала GoldSrc. Больно, но можно — значит, не горлышко.</p>'''))
+S.append(('Пайплайн выхода на витрину', '', top("Этаж 08 · зависимость разработчика") + '''
+  <h2 class="r" style="--i:0;margin-bottom:22px">Что нужно разработчику,<br>чтобы игра появилась на витрине</h2>
+  <div class="cards r" style="--i:1;grid-template-columns:repeat(5,1fr);gap:13px">'''
+  + "".join('<div class="card"><div class="anchor"><div class="kn" style="font-size:24px;color:var(--flame)">%d</div></div>'
+            '<h4 style="font-size:21px">%s</h4><p style="font-size:16px">%s</p></div>'
+            % (i + 1, t, b) for i, (t, b) in enumerate(PIPELINE))
+  + '</div>\n  <p class="note after r" style="--i:2">%s<br><b style="color:var(--flame-ink)">%s</b></p>'
+    % (PIPELINE_NOTE, PIPELINE_ACCENT)))
 
-# ── 09 этаж 04 ───────────────────────────────────────────────────────────
-S.append(('04 · Компоненты и аутсорс', '', top("Этаж 04 · компоненты и аутсорс") + '''
-  <h2 class="r" style="--i:0">Компоненты и аутсорс:<br>опыт → качество → цена → срок</h2>
-  <div class="cards c3 r" style="--i:1">
-    <div class="card"><div class="logos" style="display:grid;grid-template-columns:repeat(3,auto);justify-content:start;gap:16px 26px">''' + "".join(ico(x) for x in OUTS) + '''</div>
-      <h4>Сотни студий с узким профилем</h4>
-      <p>Virtuos и Keywords — производство, Room&nbsp;8 — арт, JALI — лицевая анимация. Каждый продаёт своё.</p></div>
-    <div class="card sage">''' + ui("compare") + '''
-      <h4>Отбор формальный</h4>
-      <p>Титры похожих игр, фильтр по профилю, арт-тест, пилот на реальном контенте — и только потом контракт.</p></div>
-    <div class="card dark">''' + brand("rockstargames") + '''
-      <h4>Контрмодель: Rockstar</h4>
-      <p>Свои студии и свой движок. Внешнего арт-аутсорса почти нет — ценой закрытости.</p></div>
-  </div>
-  <p class="note after r" style="--i:2">Cyberpunk собран из компонентов внешних команд: механики, анимация, звук, QA — всё разными студиями.</p>'''))
+S.append(('Измеримость объекта', 'dark', top("Этаж 08 · чем измеряем объект") + '''
+  <h2 class="r" style="--i:0">Если объект нельзя измерить —<br>мы его не называем</h2>
+  <div class="figs r" style="--i:1;margin-top:34px">'''
+  + "".join('<div class="fig"><div class="n">%s</div><div class="l">%s</div></div>' % (n, l) for n, l in MEASURE_FIGS)
+  + '</div>\n  <div class="cards c2 r" style="--i:2;margin-top:36px">'
+  + "".join(card("dark mid", None, t, b) for t, b in MEASURE_CARDS) + '</div>'))
 
-# ── 10 этаж 05 ───────────────────────────────────────────────────────────
-S.append(('05 · Разработка', '', top("Этаж 05 · разработка") + '''
-  <h2 class="r" style="--i:0">Разработка:<br>игровой опыт</h2>
-  <div class="cards c3 r" style="--i:1">
-    <div class="card"><div class="logos">''' + ico("cdprojekt") + ico("rockstargames") + ico("riotgames") + ico("valve") + '''</div>
-      <h4>Кто делает саму игру</h4>
-      <p>CD&nbsp;Projekt&nbsp;RED, Rockstar&nbsp;North, Riot, Valve, Insomniac. Самый населённый этаж — тысячи студий.</p></div>
-    <div class="card sage">''' + ui("eye") + '''
-      <h4>Игровой опыт,<br>а не «уникальный»</h4>
-      <p>Watch&nbsp;Dogs и GTA качественно разные, но ни одна не уникальнее другой. Оценка лишняя.</p></div>
-    <div class="card dark">''' + ui("layers") + '''
-      <h4>Заменяем</h4>
-      <p>Студий много, профили пересекаются. Игра переживает смену разработчика — Risk&nbsp;of&nbsp;Rain пережила.</p></div>
-  </div>
-  <p class="note after r" style="--i:2">Издатель и холдинг здесь не стоят — у них другой объект. Об этом следующий слайд.</p>'''))
-
-# ── 11 этаж 06 ───────────────────────────────────────────────────────────
-S.append(('06 · Издание', '', top("Этаж 06 · издание и маркетинг") + '''
-  <h2 class="r" style="--i:0">Издание: права на издание и релиз</h2>
-  <p class="lede mut r" style="--i:1;margin-top:16px;max-width:82ch">Пример: «Человека-паука» 2018 года сделала Insomniac&nbsp;Games — тогда независимая студия. Sony была только издателем и купила её через год, в 2019-м, за $229&nbsp;млн.</p>
-  <div class="cards c3 r" style="--i:2;margin-top:26px">
-    <div class="card"><div class="kn">Издатель</div>
-      <div class="logos">''' + ico("sony") + ico("ubisoft") + ico("ea") + ico("squareenix") + '''</div>
-      <h4>Права на издание и релиз</h4>
-      <p>Берёт игру и выводит её на рынок. Про ощущения игрока — вообще не он.</p></div>
-    <div class="card sage"><div class="kn">Холдинг</div>''' + ui("layers") + '''
-      <h4>Доли в тех, кто делает</h4>
-      <p>Tencent взяла 93% Riot в 2011-м и весь остаток к 2015-му. Игр не делает сама.</p></div>
-    <div class="card dark"><div class="kn">Ошибка старой карты</div>''' + ui("compare") + '''
-      <h4>Издатель ≠ разработчик ≠ холдинг</h4>
-      <p>Tencent и Sony стояли на «разработке». Три роли, три разных объекта конкуренции.</p></div>
-  </div>'''))
-
-# ── 12 этаж 07 ───────────────────────────────────────────────────────────
-S.append(('07 · Платформы и железо', '', top("Этаж 07 · платформы и железо · новый уровень") + '''
-  <h2 class="r" style="--i:0">Платформы и железо:<br>доступность</h2>
-  <div class="cards c3 r" style="--i:1">
-    <div class="card"><div class="logos">''' + ico("playstation") + ico("xbox") + ico("nintendoswitch") + '''</div>
-      <h4>Консоли</h4>
-      <p>Закрытые экосистемы со своими правилами и сертификацией.</p></div>
-    <div class="card sage"><div class="logos">''' + ico("apple") + ico("android") + '''</div>
-      <h4>Мобайл</h4>
-      <p>Самая большая аудитория — и свои ворота у каждой системы.</p></div>
-    <div class="card dark">''' + ui("gate") + '''
-      <h4>PC</h4>
-      <p>Открытая платформа: Windows, Mac, Linux. Вышел на Windows и не вышел на Mac — потерял пару процентов.</p></div>
-  </div>
-  <p class="note after r" style="--i:2">Игра только под мобайл и игра везде — разная конкурентоспособность. Но платформы — данность: их не выбирают, под них делают.</p>'''))
-
-# ── 13 этаж 08 ───────────────────────────────────────────────────────────
-S.append(('08 · Витрины и дистрибуция', '', top("Этаж 08 · витрины и дистрибуция") + '''
-  <h2 class="r" style="--i:0">Витрины и дистрибуция:<br>внимание и привычка игрока</h2>
-  <div class="cards c3 r" style="--i:1">
-    <div class="card"><div class="logos">''' + "".join(ico(x) for x in GATES) + '''</div>
-      <h4>Несколько крупных витрин</h4>
-      <p>Steam, PlayStation&nbsp;Store, Xbox, eShop, App&nbsp;Store, Google&nbsp;Play — через них проходит почти весь рынок.</p></div>
-    <div class="card sage">''' + ui("eye") + '''
-      <h4>Внимание и привычка</h4>
-      <p>Купленная библиотека не переносится. Игрок не уходит с витрины, даже если ему дают игры бесплатно.</p></div>
-    <div class="card hot">''' + ui("gate") + '''
-      <h4>Горлышко — на этом этаже</h4>
-      <p>Почему именно здесь — разберём во втором разделе.</p></div>
-  </div>'''))
-
-# ── 14 стена: мало игроков ≠ горлышко ────────────────────────────────────
-def grp(cap, tiles, cols, hot=False):
+def grp2(cap, tiles, cols, hot=False):
     return ('<div class="wallgrp%s"><div class="cap">%s</div><div class="grid" '
             'style="grid-template-columns:repeat(%d,1fr)">%s</div></div>'
             % (" hot" if hot else "", cap, cols, "".join(tiles)))
 
-S.append(('Мало игроков — ещё не горлышко', '', top("Кто стоит на карте") + '''
-  <h2 class="r" style="--i:0;margin-bottom:22px">Сколько игроков на каждом этаже<br>и можно ли их заменить</h2>
-  <div class="wall r" style="--i:1;grid-template-rows:repeat(2,1fr);grid-template-columns:1fr 1fr">'''
-  + grp("03 · Движки · <b>два</b> у 72% студий · <em>заменяемы</em>",
-        [tile("unrealengine"), tile("unity"), tile("godotengine"), tile("valve", name="Valve · Source")], 4)
-  + grp("05 · Разработка · <b>тысячи</b> студий · <em>заменяемы</em>",
-        [tile("cdprojekt"), tile("rockstargames"), tile("riotgames"), tile("valve")], 4)
-  + grp("06 · Издание · <b>десятки</b> · <em>заменяемы, но дорого</em>",
-        [tile("sony"), tile("ubisoft"), tile("ea"), tile("squareenix")], 4)
-  + grp("08 · Витрины · <b>единицы</b> крупных · <em>не заменяемы</em>",
-        [tile(g, mark=True) for g in GATES], 6, hot=True)
+S.append(('Позиция на одном этаже — рычаг на другом', '', top("Кто стоит на нескольких этажах") + '''
+  <h2 class="r" style="--i:0;margin-bottom:20px">Позиция на одном этаже —<br>рычаг на другом</h2>
+  <div class="cards c2 r" style="--i:1;flex:0 0 auto">'''
+  + "".join(
+      '<div class="card"><div class="anchor"><div class="kn">%s</div></div>'
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">%s</div></div>'
+      % (name, "".join(
+          '<div style="background:var(--paper-2);border-radius:12px;padding:14px 12px;text-align:center">'
+          '<div style="font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--muted);'
+          'text-transform:uppercase;margin-bottom:10px">%s</div>'
+          '<div style="display:flex;justify-content:center;margin-bottom:10px">%s</div>'
+          '<div style="font-size:14px;font-weight:700;line-height:1.2">%s</div></div>'
+          % (lab, ico(slug), sub) for lab, slug, sub in items))
+      for name, items in MULTI)
   + '''</div>
-  <p class="note after r" style="--i:2">Движков тоже мало — но с Quake можно уйти на GoldSrc. С витрины уйти некуда: без неё игры для игрока нет.</p>'''))
+  <p class="note after r" style="--i:2">%s</p>
+  <p class="note r" style="--i:3;margin-top:10px">%s</p>''' % (MULTI_NOTE, MULTI_SUB)))
 
-# ── 15 соседние этажи ────────────────────────────────────────────────────
 S.append(('Соседние этажи не совпадают', '', top("Проверка · объекты различаются") + '''
-  <h2 class="r" style="--i:0;margin-bottom:22px">Объекты соседних этажей<br>не совпадают</h2>
-  <div style="display:flex;flex-direction:column;gap:16px;flex:1;min-height:0">
-    <div class="vs r" style="--i:1">
-      <div class="side"><div class="lb">03 · Движки</div><div class="tx">Продают <em>стандарт</em>: выбрал один раз — живёшь в нём годами</div></div>
-      <div class="mid">≠</div>
-      <div class="side" style="padding-left:26px"><div class="lb">04 · Аутсорс</div><div class="tx">Продают <em>срок</em>: торгуешься заново на каждом контракте</div></div>
-    </div>
-    <div class="vs r" style="--i:2">
-      <div class="side"><div class="lb">05 · Разработка</div><div class="tx">Дерётся за <em>игровой опыт</em> — за то, что игрок почувствует</div></div>
-      <div class="mid">≠</div>
-      <div class="side" style="padding-left:26px"><div class="lb">06 · Издание</div><div class="tx">Дерётся за <em>права на издание</em>, а не за ощущения</div></div>
-    </div>
-    <div class="vs r" style="--i:3">
-      <div class="side"><div class="lb">07 · Платформа</div><div class="tx">Даёт <em>возможность запустить</em> — железо и API</div></div>
-      <div class="mid">≠</div>
-      <div class="side" style="padding-left:26px"><div class="lb">08 · Витрина</div><div class="tx">Даёт <em>попадание в поле зрения</em> — без неё игры для игрока нет</div></div>
-    </div>
-  </div>'''))
+  <h2 class="r" style="--i:0;margin-bottom:18px">Объекты соседних этажей<br>не совпадают</h2>
+  <div style="display:flex;flex-direction:column;gap:11px;flex:1;min-height:0">'''
+  + "".join('<div class="vs r" style="--i:%d"><div class="side"><div class="lb">%s</div><div class="tx">%s</div></div>'
+            '<div class="mid">≠</div><div class="side" style="padding-left:22px"><div class="lb">%s</div>'
+            '<div class="tx">%s</div></div></div>' % (1 + i, a, at, b, bt)
+            for i, (a, at, b, bt) in enumerate(VS_PAIRS))
+  + '</div>'))
 
-# ── 16 раздел 02 ─────────────────────────────────────────────────────────
 S.append(('Раздел 02 — горлышко', 'dark sec', '<div class="huge">02</div>' + top("Раздел 02") + '''
   <h1 class="r" style="--i:0">Бутылочное<br>горлышко</h1>
   <p class="note r" style="--i:1">Ищем его тестом отказом, а не по деньгам на этаже.</p>'''))
 
-# ── 17 понятие горлышка ──────────────────────────────────────────────────
 S.append(('Понятие горлышка', '', top("Понятие · бутылочное горлышко") + '''
   <h2 class="r" style="--i:0">Уровень, где мало игроков,<br>а зависят от них все</h2>
   <div class="cards r" style="--i:1;grid-template-columns:1.5fr 1fr;margin-top:24px">
-    <div class="col">
-      <div class="card"><div class="kn">Признак 1</div>
-        <h4>Мало игроков</h4>
-        <p>Считаем тех, к кому реально можно пойти. Сотня студий — много, несколько витрин — мало.</p></div>
-      <div class="card"><div class="kn">Признак 2</div>
-        <h4>Нет альтернативы</h4>
-        <p>Можно заменить — больно, дорого, но можно — это не горлышко.</p></div>
-      <div class="card hot"><div class="kn" style="color:rgba(22,20,15,.72)">Что удерживает</div>
-        <h4>Барьер входа</h4>
-        <p>Не деньги, а то, что деньгами не покупается: сетевой эффект и привычка.</p></div>
-    </div>
+    <div class="col">'''
+  + card("", "Признак 1", "Мало игроков", "Считаем тех, к кому реально можно пойти. Сотня студий — много, несколько витрин — мало.")
+  + card("", "Признак 2", "Нет альтернативы", "Можно заменить — больно, дорого, но можно — это не горлышко.")
+  + card("hot", "Что удерживает", "Барьер входа", "Не деньги, а то, что деньгами не покупается: накопленная библиотека и привычка.")
+  + '''</div>
     <div class="card" style="padding:24px">''' + FUNNEL + '''</div>
   </div>'''))
 
-# ── 18 тест отказом ──────────────────────────────────────────────────────
-CH = [
-    ("Откажет движок", "Берёшь другой. Valve так и сделала: ушла с Quake и собрала GoldSrc.", "Альтернатива есть", False),
-    ("Откажет подрядчик", "Меняешь. Рынок аутсорса — около $9&nbsp;млрд и сотни студий.", "Альтернатива есть", False),
-    ("Откажет издатель", "Ищешь другого или идёшь без него. Игрок этого даже не заметит.", "Есть, но дорогая", False),
-    ("Откажет витрина", "Игры не существует. Игрок физически не может её найти и купить.", "Альтернативы нет", True),
-]
 S.append(('Тест отказом', '', top("Цепочка зависимостей · тест отказом") + '''
-  <h2 class="r" style="--i:0;margin-bottom:22px">Тест отказом<br>по четырём уровням</h2>
+  <h2 class="r" style="--i:0;margin-bottom:22px">Что будет с цепочкой,<br>если этот уровень откажет</h2>
   <div class="chain">'''
   + "".join('<div class="ch%s r" style="--i:%d"><h4>%s</h4><p>%s</p><div class="verd">%s</div></div>'
-            % (" dead" if d else "", 1 + i, t, b, v) for i, (t, b, v, d) in enumerate(CH))
+            % (" dead" if d else "", 1 + i, t, b, v) for i, (t, b, v, d) in enumerate(FAILTEST))
   + '''</div>
   <p class="note after r" style="--i:6">Три уровня из четырёх заменяемы. Жёсткая зависимость ровно одна.</p>'''))
 
-# ── 19 витрина как класс ─────────────────────────────────────────────────
-S.append(('Горлышко — витрина как класс', 'dark', top("Горлышко · обоснование") + '''
+S.append(('Горлышко — уровень витрин', 'dark', top("Горлышко · обоснование") + '''
   <h2 class="r" style="--i:0">Горлышко — <span style="color:var(--flame)">уровень витрин</span>,<br>а не отдельная компания</h2>
   <div class="figs r" style="--i:1;margin-top:38px">
     <div class="fig"><div class="n">75%</div><div class="l">выручки PC-дистрибуции у Steam — это лишь PC-проекция горлышка</div></div>
     <div class="fig"><div class="n">2–3%</div><div class="l">у GOG — третьей витрины PC. Всё, что не Steam и не Epic, — крошки</div></div>
     <div class="fig"><div class="n">8–10%</div><div class="l">у Epic, который раздаёт игры бесплатно не первый год</div></div>
   </div>
-  <div class="cards c2 r" style="--i:2;margin-top:40px">
-    <div class="card dark mid" style="background:rgba(241,236,227,.08)">
-      <h4>Что мешает войти</h4>
-      <p>Купленная библиотека не переносится. Уйти — значит бросить всё, за что заплачено.</p></div>
-    <div class="card dark mid" style="background:rgba(241,236,227,.08)">
-      <h4>Контраргумент</h4>
-      <p>Steam — только PC. Поэтому горлышко не компания, а <b>уровень</b>: в каждой экосистеме своя витрина.</p></div>
-  </div>'''))
+  <div class="cards c2 r" style="--i:2;margin-top:40px">'''
+  + card("dark mid", None, "Что мешает войти", "Купленная библиотека не переносится. Уйти — значит бросить всё, за что заплачено.")
+  + card("dark mid", None, "Контраргумент", "Steam — только PC. Поэтому горлышко не компания, а <b>уровень</b>: в каждой экосистеме своя витрина.")
+  + '</div>'))
 
-# ── 20 три кейса ─────────────────────────────────────────────────────────
-CASES = [
-    ("playstation", "Cyberpunk 2077", "6 месяцев вне PS Store",
-     "Sony убрала игру 18 декабря 2020-го и вернула деньги всем. Вернулась 21 июня 2021-го.",
-     "Акции CD&nbsp;Projekt — минус 20% за день"),
-    ("apple", "Fortnite", "почти 5 лет вне App Store",
-     "Apple удалила игру в августе 2020-го. Вернулась в американский App&nbsp;Store в мае 2025-го.",
-     "Пять лет игры не существовало для iOS"),
-    ("vk", "Atomic Heart", "только VK Play в РФ и СНГ",
-     "На релизе в феврале 2023-го страница в Steam была недоступна в регионе.",
-     "Больше трёх лет без Steam в России"),
-]
-S.append(('Когда витрина выключила игру', '', top("Горлышко · проверенные случаи") + '''
+S.append(('Три случая отключения игры', '', top("Горлышко · проверенные случаи") + '''
   <h2 class="r" style="--i:0;margin-bottom:22px">Три случая отключения<br>игры витриной</h2>
   <div class="cards c3 r" style="--i:1">'''
-  + "".join('<div class="card"><div class="badge">%s</div>'
-            '<h4>%s</h4><div class="kn" style="margin:-6px 0 14px">%s</div>'
-            '<p>%s</p><p style="margin-top:auto;padding-top:16px;color:var(--ink);font-weight:700">%s</p></div>'
-            % (ico(s), t, sub, b, k) for s, t, sub, b, k in CASES)
+  + "".join('<div class="card"><div class="anchor"><div class="badge">%s</div><div class="kn">%s</div></div>'
+            '<h4>%s</h4><p>%s</p><p style="margin-top:16px;color:var(--ink);font-weight:700">%s</p></div>'
+            % (ico(sl), sub, t, b, k) for sl, t, sub, b, k in CASES)
   + '''</div>
   <p class="note after r" style="--i:2">Игра была готова и куплена. Отказал <b style="color:var(--flame-ink)">только уровень витрины</b> — и этого хватило.</p>'''))
 
-# ── 21 скрытые горлышки ──────────────────────────────────────────────────
 S.append(('Скрытые горлышки', '', top("Скрытые горлышки") + '''
   <h2 class="r" style="--i:0">Скрытые горлышки:<br>сертификация, издатель, мощности</h2>
-  <div class="cards c3 r" style="--i:1">
-    <div class="card">''' + ui("shield") + '''
-      <h4>Сертификация<br>и возрастной рейтинг</h4>
-      <p>Не прошёл ESRB или PEGI — на консоль не вышел. Обойти нельзя.</p></div>
-    <div class="card">''' + ui("no") + '''
-      <h4>Нет издателя —<br>нет игры</h4>
-      <p>Команда сильная, права есть, а издателя нет. Для инди горлышко — шестой этаж, а не восьмой.</p></div>
-    <div class="card">''' + ui("clock") + '''
-      <h4>Мощности подрядчиков</h4>
-      <p>Cyberpunk сорвал не аутсорс, а скоуп и старые консоли. Но конвейер студий — признак нехватки.</p></div>
-  </div>
+  <div class="cards c3 r" style="--i:1">'''
+  + card("tile", None, "Сертификация\nи возрастной рейтинг", "Не прошёл ESRB или PEGI — на консоль не вышел. Обойти нельзя.", "shield")
+  + card("tile", None, "Нет издателя —\nнет игры", "Команда сильная, права есть, а издателя нет. Для инди горлышко — шестой этаж, а не восьмой.", "no")
+  + card("tile", None, "Мощности подрядчиков", "Cyberpunk сорвал не аутсорс, а скоуп и старые консоли. Но конвейер студий — признак нехватки.", "clock")
+  + '''</div>
   <p class="note after r" style="--i:2">Горлышко ищется не по выручке этажа, а по отсутствию альтернативы у тех, кто зависит.</p>'''))
 
-# ── 22 открытый вопрос ───────────────────────────────────────────────────
 S.append(('Открытый вопрос', 'hot', top("Открытый вопрос · выносим в зал") + '''
   <h2 class="r" style="--i:0;font-size:80px;font-weight:900;letter-spacing:-.038em;line-height:1.0">Открытый вопрос:<br>где проходит граница рынка</h2>
-  <div class="cards c2 r" style="--i:1;margin-top:auto;width:1040px;align-self:center;flex:0 0 auto">
-    <div class="card mid"><div class="kn">Рынок = PC</div>
-      <h4>Горлышко — Steam</h4>
-      <p>75% выручки, альтернатив практически нет.</p></div>
-    <div class="card mid"><div class="kn">Рынок = гейминг целиком</div>
-      <h4>Горлышек несколько</h4>
-      <p>По одному на экосистему — и каждое монополист в своей.</p></div>
-  </div>
-  <div class="mt"></div>'''))
+  <div class="cards c2 r" style="--i:1;margin-top:auto;width:1040px;align-self:center;flex:0 0 auto">'''
+  + card("mid", "Рынок = PC", "Горлышко — Steam", "75% выручки, альтернатив практически нет.")
+  + card("mid", "Рынок = гейминг целиком", "Горлышек несколько", "По одному на экосистему — и каждое монополист в своей.")
+  + '</div>\n  <div class="mt"></div>'))
 
-# ── источники ────────────────────────────────────────────────────────────
 S.append(('Источники', '', top("Источники всех чисел") + '''
-  <h2 class="r" style="--i:0;margin-bottom:20px">Откуда взяты числа</h2>
+  <h2 class="r" style="--i:0;font-size:44px;margin-bottom:16px">Откуда взяты числа</h2>
   <div class="srcwrap r" style="--i:1"><table class="src">
     <thead><tr><th>Число</th><th>Где в деке</th><th>Источник</th></tr></thead>
-    <tbody><tr><td class="c1">Unreal 42%, Unity 30% — основной движок студий</td><td class="c2">этаж 03, карта</td><td class="c3"><a href="https://shattered.io/unreal-engine-6-unity-market-share-2026" target="_blank" rel="noopener">shattered.io</a> <span class="x">· опрос GDC 2026</span></td></tr><tr><td class="c1">Godot 8–10% релизов в Steam</td><td class="c2">этаж 03</td><td class="c3"><a href="https://shattered.io/unreal-engine-6-unity-market-share-2026" target="_blank" rel="noopener">shattered.io</a> <span class="x">· Q1 2026</span></td></tr><tr><td class="c1">Steam 74–75% PC-дистрибуции; Epic 8–10%; GOG 2–3%</td><td class="c2">горлышко</td><td class="c3"><a href="https://levvvel.com/statistics/pc-gaming" target="_blank" rel="noopener">levvvel.com</a> <span class="x">· 2025</span></td></tr><tr><td class="c1">Аутсорс ≈ $9 млрд, 2025</td><td class="c2">тест отказом</td><td class="c3"><a href="https://www.verifiedmarketreports.com/product/game-outsourcing-service-market/" target="_blank" rel="noopener">verifiedmarketreports.com</a> <span class="x">· оценки других отчётов: $4–9 млрд</span></td></tr><tr><td class="c1">Sony купила Insomniac за $229 млн, август 2019</td><td class="c2">этаж 06</td><td class="c3"><a href="https://gameworldobserver.com/2020/02/11/sony-paid-229m-insomniac-games" target="_blank" rel="noopener">gameworldobserver.com</a> <span class="x">· по отчётности Sony</span></td></tr><tr><td class="c1">Tencent: 93% Riot в 2011, 100% к концу 2015</td><td class="c2">этаж 06</td><td class="c3"><a href="https://techcrunch.com/2015/12/16/tencent-takes-full-control-of-league-of-legends-creator-riot-games/" target="_blank" rel="noopener">techcrunch.com</a></td></tr><tr><td class="c1">Cyberpunk вне PS Store 18.12.2020 — 21.06.2021; акции CD Projekt −20%</td><td class="c2">кейсы</td><td class="c3"><a href="https://www.cnbc.com/2020/12/18/sony-pulls-cyberpunk-2077-from-playstation-store-after-backlash.html" target="_blank" rel="noopener">cnbc.com</a> <span class="x">· возврат: engadget.com</span></td></tr><tr><td class="c1">Fortnite вне App Store: август 2020 — май 2025</td><td class="c2">кейсы</td><td class="c3"><a href="https://www.cnbc.com/2025/05/20/apple-fortnite-app-store-epic-games.html" target="_blank" rel="noopener">cnbc.com</a></td></tr><tr><td class="c1">Atomic Heart только в VK Play с 21.02.2023; в Steam РФ — 08.2026</td><td class="c2">кейсы</td><td class="c3"><a href="https://habr.com/ru/news/687214/" target="_blank" rel="noopener">habr.com · 4pda.to</a> <span class="x">· 4pda.to/2026/08/04/459645</span></td></tr><tr><td class="c1">Super Mario Bros. — 1985</td><td class="c2">этаж 01</td><td class="c3"><a href="https://www.nintendo.com/us/store/products/super-mario-bros-nes-nintendo-switch-online/" target="_blank" rel="noopener">nintendo.com</a></td></tr></tbody></table></div>
-  <p class="note after r" style="--i:2">Даты и суммы по Cyberpunk, Fortnite, Atomic Heart и Insomniac сверены по двум независимым публикациям каждая.</p>'''))
+    <tbody>'''
+  + "".join('<tr><td class="c1">%s</td><td class="c2">%s</td><td class="c3">'
+            '<a href="%s" target="_blank" rel="noopener">%s</a></td></tr>' % (n, w, url, dom)
+            for n, w, dom, url in SOURCES)
+  + '''</tbody></table></div>
+  <p class="note after r" style="--i:2">%s</p>''' % SOURCES_NOTE))
 
-# ── понятия ───────────────────────────────────────────────────────────
-GL = [
-    ("Конкуренция", "Борьба за то, чего на всех не хватает. Всегда за что-то конкретное."),
-    ("Барьер входа", "Что мешает новому игроку занять уровень. Чем выше — тем дольше держится горлышко."),
-    ("Объект конкуренции", "То, обладание которым даёт преимущество. На каждом этаже свой."),
-    ("Зависимость в цепочке", "Насколько жёстко уровень нуждается в соседнем. Меряется отказом."),
-    ("Бутылочное горлышко", "Уровень, где мало игроков, а зависят от них все."),
-    ("Уровень", "Место, где есть свой объект конкуренции. Не шаг процесса."),
-]
 S.append(('Понятия такта 2', '', top("Понятия такта 2") + '''
-  <h2 class="r" style="--i:0;margin-bottom:22px">Понятия, которыми пользовались</h2>
+  <h2 class="r" style="--i:0;font-size:44px;margin-bottom:16px">Понятия, которыми пользовались</h2>
   <div class="gl">'''
   + "".join('<div class="gi r" style="--i:%d"><dt>%s</dt><dd>%s</dd></div>' % (1 + i, t, b)
-            for i, (t, b) in enumerate(GL))
+            for i, (t, b) in enumerate(TERMS))
   + '</div>'))
-
 
 # ── сборка ───────────────────────────────────────────────────────────────
 out = []
-for title, cls, body in S:
-    c = ("s " + cls).strip()
-    out.append('<section class="%s" data-t="%s">%s</section>' % (c, title, body))
-html = "".join(out)
-pathlib.Path(__file__).resolve().parent.joinpath("slides.html").write_text(html, encoding="utf-8")
+for title, cls, b in S:
+    out.append('<section class="%s" data-t="%s">%s</section>' % (("s " + cls).strip(), title, b))
+pathlib.Path(__file__).resolve().parent.joinpath("slides.html").write_text("".join(out), encoding="utf-8")
 print("слайдов:", len(S))
