@@ -285,16 +285,22 @@ S.append(('Открытый вопрос', 'hot', top("Открытый вопр
   + card("mid", "Рынок = гейминг целиком", "Горлышек несколько", "По одному на экосистему — и каждое монополист в своей.")
   + '</div>\n  <div class="mt"></div>'))
 
+HALF = len(SOURCES) // 2 + len(SOURCES) % 2
+def src_col(items):
+    return "".join(
+        '<div class="srow"><span class="num">%s</span>'
+        '<a class="lnk" href="%s" target="_blank" rel="noopener">%s</a>'
+        '<span class="whr">%s</span></div>' % (n, url, dom, w)
+        for n, w, dom, url in items)
+
 S.append(('Источники', '', top("Источники всех чисел") + '''
-  <h2 class="r" style="--i:0;font-size:44px;margin-bottom:16px">Откуда взяты числа</h2>
-  <div class="srcwrap r" style="--i:1"><table class="src">
-    <thead><tr><th>Число</th><th>Где в деке</th><th>Источник</th></tr></thead>
-    <tbody>'''
-  + "".join('<tr><td class="c1">%s</td><td class="c2">%s</td><td class="c3">'
-            '<a href="%s" target="_blank" rel="noopener">%s</a></td></tr>' % (n, w, url, dom)
-            for n, w, dom, url in SOURCES)
-  + '''</tbody></table></div>
-  <p class="note after r" style="--i:2">%s</p>''' % SOURCES_NOTE))
+  <h2 class="r" style="--i:0;font-size:42px;margin-bottom:14px">Откуда взяты числа</h2>
+  <div class="srcgrid r" style="--i:1">
+    <div><div class="hd">Число · где в деке · источник</div>%s</div>
+    <div><div class="hd">Число · где в деке · источник</div>%s</div>
+  </div>
+  <p class="note after r" style="--i:2">%s</p>'''
+  % (src_col(SOURCES[:HALF]), src_col(SOURCES[HALF:]), SOURCES_NOTE)))
 
 S.append(('Понятия такта 2', '', top("Понятия такта 2") + '''
   <h2 class="r" style="--i:0;font-size:44px;margin-bottom:16px">Понятия, которыми пользовались</h2>

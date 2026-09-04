@@ -142,8 +142,10 @@ b{font-weight:700}
 .pipe .st.mid h5{margin-top:0}
 .pipe .st .no{font-size:13px;font-weight:800;letter-spacing:.1em;color:var(--flame-ink);margin-bottom:14px}
 .pipe .st.last .no{color:rgba(22,20,15,.7)}
-.pipe .st .ui{width:56px;height:56px;margin-bottom:auto}
+.pipe .st .badge{width:96px;height:96px;margin-bottom:auto;flex:none}
+.pipe .st .ui{width:52px;height:52px}
 .pipe .st.last .ui{stroke:var(--ink)}
+.pipe .st .badge + h5{margin-top:16px}
 .pipe .st h5{font-size:20px;font-weight:800;letter-spacing:-.02em;line-height:1.12;margin:16px 0 8px}
 .pipe .st p{font-size:15px;line-height:1.32;color:var(--muted);max-width:none}
 .pipe .st.last p{color:rgba(22,20,15,.78)}
@@ -194,8 +196,11 @@ b{font-weight:700}
 /* карточки не растягиваются на всю высоту: короткий текст в высокой карточке
    оставлял пустоты сверху и снизу. Ряд карточек центрируется в кадре целиком */
 .s > .cards{align-items:stretch;grid-auto-rows:minmax(0,1fr)}
-.col{display:flex;flex-direction:column;gap:16px;min-height:0}
-.col > .card{flex:1;min-height:0;justify-content:center;padding:22px 28px}
+.col{display:flex;flex-direction:column;gap:14px;min-height:0;justify-content:center}
+/* карточки колонки по контенту, центрируется вся колонка — иначе текст режется */
+.col > .card{flex:0 0 auto;justify-content:flex-start;padding:20px 26px}
+.col > .card > .anchor{margin-bottom:10px}
+.col > .card > h4{margin-bottom:8px}
 .col > .card > .kn{margin-bottom:10px}
 .s > .cards > .card{min-height:0}
 /* якорь карточки (иконка, метка, ряд логотипов) держится сверху, текст уходит вниз —
@@ -297,16 +302,16 @@ li::before{content:"";position:absolute;left:0;top:.5em;width:13px;height:13px;b
 .fn .out{margin-top:20px;font-size:15px;font-weight:800;letter-spacing:.06em}
 
 /* ============ источники ============ */
-.srcwrap{flex:1;min-height:0;background:var(--tile);border-radius:16px;padding:6px 28px 10px;overflow:hidden}
-.src{width:100%;border-collapse:collapse;font-size:17.5px;line-height:1.3}
-.src th{text-align:left;font-size:13px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
-  color:var(--muted);padding:14px 14px 10px 0;border-bottom:2px solid var(--hair)}
-.src td{padding:10px 14px 10px 0;border-bottom:1px solid var(--hair);vertical-align:top}
-.src tr:last-child td{border-bottom:none}
-.src td.c1{font-weight:600;color:var(--ink);width:46%}
-.src td.c2{color:var(--muted);width:15%;white-space:nowrap}
-.src td.c3 a{color:var(--flame-ink);font-weight:600;text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1.5px}
-.src td.c3 .x{color:var(--muted);font-size:15px}
+.srcgrid{flex:1;min-height:0;display:grid;grid-template-columns:1fr 1fr;gap:0 22px;align-content:start}
+.srcgrid .hd{font-size:11.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--muted);padding:0 0 7px;border-bottom:2px solid var(--hair)}
+.srow{display:grid;grid-template-columns:1fr auto;gap:2px 14px;padding:7px 0;
+  border-bottom:1px solid var(--hair);align-items:baseline}
+.srow:last-child{border-bottom:none}
+.srow .num{font-size:14px;font-weight:600;line-height:1.25;color:var(--ink)}
+.srow .lnk{font-size:13px;font-weight:700;color:var(--flame-ink);text-decoration:underline;
+  text-underline-offset:2px;white-space:nowrap}
+.srow .whr{grid-column:1/-1;font-size:12px;color:var(--muted);line-height:1.2}
 
 /* ============ глоссарий ============ */
 .gl{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:11px;min-height:0}
@@ -459,10 +464,11 @@ li::before{content:"";position:absolute;left:0;top:.5em;width:13px;height:13px;b
   <h2 class="r" style="--i:0;font-size:80px;font-weight:900;letter-spacing:-.038em;line-height:1.0">Открытый вопрос:<br>где проходит граница рынка</h2>
   <div class="cards c2 r" style="--i:1;margin-top:auto;width:1040px;align-self:center;flex:0 0 auto"><div class="card mid"><div class="anchor"><div class="kn">Рынок = PC</div></div><h4>Горлышко — Steam</h4><p>75% выручки, альтернатив практически нет.</p></div><div class="card mid"><div class="anchor"><div class="kn">Рынок = гейминг целиком</div></div><h4>Горлышек несколько</h4><p>По одному на экосистему — и каждое монополист в своей.</p></div></div>
   <div class="mt"></div></section><section class="s" data-t="Источники"><div class="top"><span class="pill">Источники всех чисел</span><span class="cnt"></span></div>
-  <h2 class="r" style="--i:0;font-size:44px;margin-bottom:16px">Откуда взяты числа</h2>
-  <div class="srcwrap r" style="--i:1"><table class="src">
-    <thead><tr><th>Число</th><th>Где в деке</th><th>Источник</th></tr></thead>
-    <tbody><tr><td class="c1">Unreal 42%, Unity 30% — основной движок студий (опрос GDC 2026); Godot 8–10% релизов Steam</td><td class="c2">этаж 03</td><td class="c3"><a href="https://shattered.io/unreal-engine-6-unity-market-share-2026" target="_blank" rel="noopener">shattered.io</a></td></tr><tr><td class="c1">Steam 74–75% PC-дистрибуции; Epic 8–10%; GOG 2–3%; 147 млн MAU; пик 42 млн</td><td class="c2">этажи 08, горлышко</td><td class="c3"><a href="https://levvvel.com/statistics/pc-gaming" target="_blank" rel="noopener">levvvel.com</a></td></tr><tr><td class="c1">Комиссии: Steam 30%, Epic 12%; с 06.2025 у Epic 0% на первый $1 млн в год</td><td class="c2">пайплайн витрины</td><td class="c3"><a href="https://shattered.io/steam-vs-epic-games-store/" target="_blank" rel="noopener">shattered.io</a></td></tr><tr><td class="c1">Epic Games Store: 295 млн аккаунтов</td><td class="c2">измеримость</td><td class="c3"><a href="https://shattered.io/epic-games-store-revenue-2026/" target="_blank" rel="noopener">shattered.io</a></td></tr><tr><td class="c1">Роялти Unreal 5% после $1 млн; 0% при продаже в Epic Games Store</td><td class="c2">рычаг Epic</td><td class="c3"><a href="https://www.unrealengine.com/license" target="_blank" rel="noopener">unrealengine.com</a></td></tr><tr><td class="c1">App Store 30%, 15% для малого бизнеса</td><td class="c2">пайплайн витрины</td><td class="c3"><a href="https://developer.apple.com/app-store/small-business-program/" target="_blank" rel="noopener">developer.apple.com</a></td></tr><tr><td class="c1">Google Play 30%, 15% на первый $1 млн в год с разработчика</td><td class="c2">пайплайн витрины</td><td class="c3"><a href="https://support.google.com/googleplay/android-developer/answer/112622" target="_blank" rel="noopener">support.google.com</a></td></tr><tr><td class="c1">Steam требует раскрывать ИИ-контент: pre-generated и live-generated</td><td class="c2">правила контента</td><td class="c3"><a href="https://partner.steamgames.com/doc/gettingstarted/contentsurvey" target="_blank" rel="noopener">partner.steamgames.com</a></td></tr><tr><td class="c1">CD Projekt: переход с REDengine на Unreal Engine 5, март 2022</td><td class="c2">этаж 03, тест отказом</td><td class="c3"><a href="https://www.cdprojekt.com/en/media/news/new-witcher-saga-announced-cd-projekt-red-begins-development-on-unreal-engine-5-as-part-of-a-strategic-partnership-with-epic-games/" target="_blank" rel="noopener">cdprojekt.com</a></td></tr><tr><td class="c1">Sony купила Insomniac за $229 млн, август 2019</td><td class="c2">этаж 06</td><td class="c3"><a href="https://gameworldobserver.com/2020/02/11/sony-paid-229m-insomniac-games" target="_blank" rel="noopener">gameworldobserver.com</a></td></tr><tr><td class="c1">Tencent: 93% Riot в 2011, 100% к концу 2015</td><td class="c2">этаж 06</td><td class="c3"><a href="https://techcrunch.com/2015/12/16/tencent-takes-full-control-of-league-of-legends-creator-riot-games/" target="_blank" rel="noopener">techcrunch.com</a></td></tr><tr><td class="c1">Cyberpunk вне PS Store 18.12.2020 — 21.06.2021; акции CD Projekt −20%</td><td class="c2">кейсы</td><td class="c3"><a href="https://www.cnbc.com/2020/12/18/sony-pulls-cyberpunk-2077-from-playstation-store-after-backlash.html" target="_blank" rel="noopener">cnbc.com</a></td></tr><tr><td class="c1">Fortnite вне App Store: август 2020 — май 2025</td><td class="c2">кейсы</td><td class="c3"><a href="https://www.cnbc.com/2025/05/20/apple-fortnite-app-store-epic-games.html" target="_blank" rel="noopener">cnbc.com</a></td></tr><tr><td class="c1">Atomic Heart только в VK Play с 21.02.2023; в Steam РФ — 08.2026</td><td class="c2">кейсы</td><td class="c3"><a href="https://habr.com/ru/news/687214/" target="_blank" rel="noopener">habr.com</a></td></tr><tr><td class="c1">Super Mario Bros. — 1985</td><td class="c2">этаж 01</td><td class="c3"><a href="https://www.nintendo.com/us/store/products/super-mario-bros-nes-nintendo-switch-online/" target="_blank" rel="noopener">nintendo.com</a></td></tr></tbody></table></div>
+  <h2 class="r" style="--i:0;font-size:42px;margin-bottom:14px">Откуда взяты числа</h2>
+  <div class="srcgrid r" style="--i:1">
+    <div><div class="hd">Число · где в деке · источник</div><div class="srow"><span class="num">Unreal 42%, Unity 30% — основной движок студий (опрос GDC 2026); Godot 8–10% релизов Steam</span><a class="lnk" href="https://shattered.io/unreal-engine-6-unity-market-share-2026" target="_blank" rel="noopener">shattered.io</a><span class="whr">этаж 03</span></div><div class="srow"><span class="num">Steam 74–75% PC-дистрибуции; Epic 8–10%; GOG 2–3%; 147 млн MAU; пик 42 млн</span><a class="lnk" href="https://levvvel.com/statistics/pc-gaming" target="_blank" rel="noopener">levvvel.com</a><span class="whr">этажи 08, горлышко</span></div><div class="srow"><span class="num">Комиссии: Steam 30%, Epic 12%; с 06.2025 у Epic 0% на первый $1 млн в год</span><a class="lnk" href="https://shattered.io/steam-vs-epic-games-store/" target="_blank" rel="noopener">shattered.io</a><span class="whr">пайплайн витрины</span></div><div class="srow"><span class="num">Epic Games Store: 295 млн аккаунтов</span><a class="lnk" href="https://shattered.io/epic-games-store-revenue-2026/" target="_blank" rel="noopener">shattered.io</a><span class="whr">измеримость</span></div><div class="srow"><span class="num">Роялти Unreal 5% после $1 млн; 0% при продаже в Epic Games Store</span><a class="lnk" href="https://www.unrealengine.com/license" target="_blank" rel="noopener">unrealengine.com</a><span class="whr">рычаг Epic</span></div><div class="srow"><span class="num">App Store 30%, 15% для малого бизнеса</span><a class="lnk" href="https://developer.apple.com/app-store/small-business-program/" target="_blank" rel="noopener">developer.apple.com</a><span class="whr">пайплайн витрины</span></div><div class="srow"><span class="num">Google Play 30%, 15% на первый $1 млн в год с разработчика</span><a class="lnk" href="https://support.google.com/googleplay/android-developer/answer/112622" target="_blank" rel="noopener">support.google.com</a><span class="whr">пайплайн витрины</span></div><div class="srow"><span class="num">Steam требует раскрывать ИИ-контент: pre-generated и live-generated</span><a class="lnk" href="https://partner.steamgames.com/doc/gettingstarted/contentsurvey" target="_blank" rel="noopener">partner.steamgames.com</a><span class="whr">правила контента</span></div></div>
+    <div><div class="hd">Число · где в деке · источник</div><div class="srow"><span class="num">CD Projekt: переход с REDengine на Unreal Engine 5, март 2022</span><a class="lnk" href="https://www.cdprojekt.com/en/media/news/new-witcher-saga-announced-cd-projekt-red-begins-development-on-unreal-engine-5-as-part-of-a-strategic-partnership-with-epic-games/" target="_blank" rel="noopener">cdprojekt.com</a><span class="whr">этаж 03, тест отказом</span></div><div class="srow"><span class="num">Sony купила Insomniac за $229 млн, август 2019</span><a class="lnk" href="https://gameworldobserver.com/2020/02/11/sony-paid-229m-insomniac-games" target="_blank" rel="noopener">gameworldobserver.com</a><span class="whr">этаж 06</span></div><div class="srow"><span class="num">Tencent: 93% Riot в 2011, 100% к концу 2015</span><a class="lnk" href="https://techcrunch.com/2015/12/16/tencent-takes-full-control-of-league-of-legends-creator-riot-games/" target="_blank" rel="noopener">techcrunch.com</a><span class="whr">этаж 06</span></div><div class="srow"><span class="num">Cyberpunk вне PS Store 18.12.2020 — 21.06.2021; акции CD Projekt −20%</span><a class="lnk" href="https://www.cnbc.com/2020/12/18/sony-pulls-cyberpunk-2077-from-playstation-store-after-backlash.html" target="_blank" rel="noopener">cnbc.com</a><span class="whr">кейсы</span></div><div class="srow"><span class="num">Fortnite вне App Store: август 2020 — май 2025</span><a class="lnk" href="https://www.cnbc.com/2025/05/20/apple-fortnite-app-store-epic-games.html" target="_blank" rel="noopener">cnbc.com</a><span class="whr">кейсы</span></div><div class="srow"><span class="num">Atomic Heart только в VK Play с 21.02.2023; в Steam РФ — 08.2026</span><a class="lnk" href="https://habr.com/ru/news/687214/" target="_blank" rel="noopener">habr.com</a><span class="whr">кейсы</span></div><div class="srow"><span class="num">Super Mario Bros. — 1985</span><a class="lnk" href="https://www.nintendo.com/us/store/products/super-mario-bros-nes-nintendo-switch-online/" target="_blank" rel="noopener">nintendo.com</a><span class="whr">этаж 01</span></div></div>
+  </div>
   <p class="note after r" style="--i:2">Консольные комиссии (около 30%) платформы публично не раскрывают — указаны как оценка. Аудиторные метрики Steam и Epic взяты из одного агрегатора каждая и второй независимой публикацией не подтверждены.</p></section><section class="s" data-t="Понятия такта 2"><div class="top"><span class="pill">Понятия такта 2</span><span class="cnt"></span></div>
   <h2 class="r" style="--i:0;font-size:44px;margin-bottom:16px">Понятия, которыми пользовались</h2>
   <div class="gl"><div class="gi r" style="--i:1"><dt>Конкуренция</dt><dd>Борьба за то, чего на всех не хватает. Всегда за что-то конкретное: если объект не назван, слово пустое.</dd></div><div class="gi r" style="--i:2"><dt>Объект конкуренции</dt><dd>То, обладание чем даёт преимущество. На каждом этаже свой. Не деньги и не доля рынка — это следствие. Если объект нельзя измерить, мы его не называем.</dd></div><div class="gi r" style="--i:3"><dt>Уровень (этаж)</dt><dd>Место в отрасли, где есть свой объект конкуренции. Не шаг процесса: этажи существуют параллельно, одна компания может стоять на нескольких.</dd></div><div class="gi r" style="--i:4"><dt>Барьер входа</dt><dd>То, что мешает новому игроку занять уровень: право, стандарт, накопленная база, сертификация. Чем выше барьер, тем дольше держится горлышко.</dd></div><div class="gi r" style="--i:5"><dt>Зависимость в цепочке</dt><dd>Насколько жёстко уровень нуждается в соседнем. Меряется тестом отказом: что будет с цепочкой, если уровень откажет, и есть ли чем заменить.</dd></div><div class="gi r" style="--i:6"><dt>Бутылочное горлышко</dt><dd>Уровень, где мало игроков, а зависят от них все. Там сосредоточена власть над всей цепочкой. Мало игроков само по себе — ещё не горлышко: нужно, чтобы не было альтернативы.</dd></div></div></section></div>
@@ -561,6 +567,51 @@ li::before{content:"";position:absolute;left:0;top:.5em;width:13px;height:13px;b
     var m=s.querySelector('.cnt');
     if(m) m.textContent=String(i+1).padStart(2,'0')+' / '+String(total).padStart(2,'0');
   });
+
+  /* ── режим проверки вёрстки: ?qa=1 ──────────────────────────────────────
+     Ловит то, что не видно на скриншоте бегло: обрезанный текст, элементы
+     за пределами родителя и кадра, наложения. Результат кладётся в title,
+     откуда его читает src/qa.py. */
+  if(location.search.indexOf('qa')>=0){
+    window.__qa=function(idx){
+      show(idx-1,1);
+      var el=slides[idx-1], deck=document.getElementById('deck').getBoundingClientRect(), bad=[];
+      function box(n){ return n.getBoundingClientRect(); }
+      var nodes=el.querySelectorAll('*');
+      for(var i=0;i<nodes.length;i++){
+        var n=nodes[i], isSvg=(n instanceof SVGElement);
+        var nm=(typeof n.className==='string'&&n.className)?n.className:n.tagName;
+        var b=box(n); if(b.width===0||b.height===0) continue;
+        var st=getComputedStyle(n); if(st.visibility==='hidden'||st.opacity==='0') continue;
+        // текст не помещается в свой бокс
+        if(n.scrollHeight-n.clientHeight>2 && st.overflow!=='visible' && n.clientHeight>0)
+          bad.push('обрезан текст: '+nm+' +'+(n.scrollHeight-n.clientHeight)+'px');
+        // элемент вышел за кадр
+        // декоративная векторная графика намеренно уходит за кадр — за рамку её не проверяем
+        if(!isSvg&&(b.left<deck.left-1||b.right>deck.right+1||b.top<deck.top-1||b.bottom>deck.bottom+1))
+          bad.push('за кадром: '+nm);
+        // элемент вышел за карточку-родителя
+        var p=n.parentElement;
+        if(p&&p!==el){
+          var ps=getComputedStyle(p);
+          if((ps.overflow==='visible')&&(p.classList.contains('card')||p.classList.contains('st')||p.classList.contains('badge'))){
+            var pb=box(p);
+            if(b.top<pb.top-1||b.bottom>pb.bottom+1||b.left<pb.left-1||b.right>pb.right+1)
+              bad.push('вне карточки: '+nm+' в .'+(String(p.className).split(' ')[0]));
+          }
+        }
+      }
+      return bad;
+    };
+    window.__qaAll=function(){
+      var out={};
+      for(var i=1;i<=slides.length;i++){ var r=window.__qa(i); if(r.length) out[i]=r; }
+      document.title='QA:'+JSON.stringify(out);
+      return out;
+    };
+    setTimeout(function(){ window.__qaAll(); }, 900);
+  }
+
   var start=parseInt((location.hash||'#1').slice(1),10);
   show(isNaN(start)?0:start-1, 1);
 })();
