@@ -131,7 +131,7 @@ def mapslide(title_html, rows, note, legend=None):
     leg = ('<div class="maplegend r" style="--i:1">%s</div>' % "".join(
         '<span><i style="%s"></i>%s</span>' % (st, lab) for st, lab in legend)) if legend else ""
     tailn = '<p class="note after r" style="--i:12">%s</p>' % note if note else ""
-    return title_html + leg + h + '<div class="map">' + body + '</div>' + tailn
+    return title_html + leg + h + '<div class="map%s">' % (' dyn' if legend else '') + body + '</div>' + tailn
 
 S = []
 rays = ('<svg class="rays" viewBox="0 0 200 200" fill="none" stroke="rgba(22,20,15,.34)" stroke-width=".7">'
@@ -239,11 +239,11 @@ S.append(('Регуляторы', '', top("Блок 4 · Ситуация 1.5 ·
   <p class="note after r" style="--i:2">%s</p>''' % REGULATORS_NOTE))
 
 S.append(('Карта · Ситуация 1.5', '', top("Блок 4 · Ситуация 1.5 · карта") +
-  mapslide('<h2 class="r" style="--i:0;font-size:38px;margin-bottom:10px">%s</h2>' % nl(SIT15_TITLE), MAP_15, SIT15_NOTE,
+  mapslide('<h2 class="r" style="--i:0;font-size:36px;margin-bottom:8px">%s</h2>' % nl(SIT15_TITLE), MAP_15, SIT15_NOTE,
            legend=[("background:#F26A1B", "усиливается"), ("background:#D3CCBE", "сокращается"), ("background:#14130F", "горлышко")])))
 
 S.append(('Карта · Ситуация 2', '', top("Блок 5 · Ситуация 2 · карта") +
-  mapslide('<h2 class="r" style="--i:0;font-size:38px;margin-bottom:10px">%s</h2>' % nl(SIT2_TITLE), MAP_2, SIT2_NOTE,
+  mapslide('<h2 class="r" style="--i:0;font-size:36px;margin-bottom:8px">%s</h2>' % nl(SIT2_TITLE), MAP_2, SIT2_NOTE,
            legend=[("background:#F26A1B", "усиливается"), ("background:#FBF9F4;border-left:4px solid #16140F;border-radius:3px", "поглотил соседний этаж"), ("background:#14130F", "горлышко")])))
 
 S.append(('Механизм перехода', '', top("Блок 6 · механизм перехода") + '''

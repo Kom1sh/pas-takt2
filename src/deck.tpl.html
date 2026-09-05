@@ -125,6 +125,16 @@ b{font-weight:700}
 .lvl.merged{box-shadow:inset 4px 0 0 var(--ink);background:#FBF9F4}
 .lvl.merged .tag{background:var(--ink);color:var(--paper)}
 .lvl.neck .tag{background:rgba(242,106,27,.22);color:#FF9A52}
+/* карты 1.5 и 2: двухстрочные названия и подписи состояний требуют компактной строки */
+.map.dyn{gap:6px}
+.map.dyn .lvl{padding:5px 18px 5px 14px;gap:0 18px;grid-template-columns:50px 232px 1fr auto}
+.map.dyn .lvl .no{font-size:19px}
+.map.dyn .lvl .nm{font-size:20px;line-height:1.05}
+.map.dyn .lvl .oj{font-size:19px;line-height:1.15;display:flex;flex-direction:column;align-items:flex-start;gap:4px}
+.map.dyn .lvl .tag{margin-left:0;font-size:11.5px;padding:2px 9px;line-height:1.2}
+.map.dyn .lvl .who .ic{width:36px;height:36px}
+.map.dyn .lvl .who img.ic{height:32px!important;max-width:92px}
+.map.dyn .lvl .who{gap:14px;min-width:300px}
 .maplegend{display:flex;gap:26px;flex:none;margin-bottom:10px;font-size:13px;color:var(--muted)}
 .maplegend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:7px}
 
@@ -514,7 +524,7 @@ li::before{content:"";position:absolute;left:0;top:.5em;width:13px;height:13px;b
         var p=n.parentElement;
         if(p&&p!==el){
           var ps=getComputedStyle(p);
-          if((ps.overflow==='visible')&&(p.classList.contains('card')||p.classList.contains('st')||p.classList.contains('badge'))){
+          if((ps.overflow==='visible')&&(p.classList.contains('card')||p.classList.contains('st')||p.classList.contains('badge')||p.classList.contains('lvl')||p.classList.contains('oj'))){
             var pb=box(p);
             if(b.top<pb.top-1||b.bottom>pb.bottom+1||b.left<pb.left-1||b.right>pb.right+1)
               bad.push('вне карточки: '+nm+' в .'+(String(p.className).split(' ')[0]));
