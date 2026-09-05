@@ -16,7 +16,10 @@ import sys
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
 from content import (MAP, FLOORS, PLAT_VS_SHOP, VS_PAIRS, CHAIN, CHAIN_NOTE, PIPELINE,
                      PIPELINE_ICONS, PIPELINE_NOTE, PIPELINE_ACCENT, MEASURE_FIGS, MEASURE_CARDS, MULTI,
-                     MULTI_NOTE, MULTI_SUB, FAILTEST, CASES, TERMS, SOURCES, SOURCES_NOTE)
+                     MULTI_NOTE, MULTI_SUB, FAILTEST, CASES, TERMS, SOURCES, SOURCES_NOTE,
+                     TRENDS_15, REGULATORS, REGULATORS_NOTE, MAP_15, SIT15_TITLE, SIT15_NOTE,
+                     MAP_2, SIT2_TITLE, SIT2_NOTE, TRANSITION, TRANSITION_NOTE, POWER, POWER_TITLE,
+                     TERMS_T3, SOURCES_T3)
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 ICONS = pathlib.Path(os.environ.get("PPTX_ICONS", ROOT / "src" / "pptx-icons"))
@@ -211,29 +214,47 @@ def slide_object():
         dict(kind="dark", title="Проверка: сравни\nс этажом выше", body="Объект тот же — значит, это один уровень, а не два. Если объект нельзя измерить — мы его не называем.", badge=ui_png("compare")),
     ])
 
-def slide_map():
-    s = new_slide(); top(s, "Схема · разметка карты")
-    y0 = 1.05; text(s, PAD + 0.55, y0, 2.4, 0.25, "УРОВЕНЬ", size=8.5, bold=True, color=MUTED)
+def slide_map(rows=None, title=None, note=None, pill="Схема · разметка карты"):
+    rows = rows or [(a, b, c, d, None, "") for a, b, c, d in MAP]
+    s = new_slide(); top(s, pill)
+    y0 = 1.05
+    if title:
+        text(s, PAD, 0.98, W - 2 * PAD, 1.0, title, size=28, bold=True, color=INK, line=1.05); y0 = 2.05
+    text(s, PAD + 0.55, y0, 2.4, 0.25, "УРОВЕНЬ", size=8.5, bold=True, color=MUTED)
     text(s, PAD + 3.05, y0, 4, 0.25, "ОБЪЕКТ КОНКУРЕНЦИИ", size=8.5, bold=True, color=MUTED)
     text(s, W - PAD - 3.6, y0, 3.6, 0.25, "КТО СТОИТ", size=8.5, bold=True, color=MUTED, align=PP_ALIGN.RIGHT)
-    rh = 0.66; gap = 0.07; y = y0 + 0.32
-    for i, (no, nm, oj, logos) in enumerate([(a, b.replace(chr(10), '\n'), c, d) for a, b, c, d in MAP]):
-        neck = (no == "08")
-        rect(s, PAD, y, W - 2 * PAD, rh, JET if neck else TILE, radius=0.12)
+    n = len(rows); avail = (6.75 if note else 7.05) - (y0 + 0.32); gap = 0.07
+    rh = (avail - gap * (n - 1)) / n; y = y0 + 0.32
+    for no, nm, oj, logos, state, tag in rows:
+        neck = state == "neck"
+        fill = JET if neck else (PAPER2 if state == "shrink" else (C("FBF9F4") if state == "merged" else TILE))
+        rect(s, PAD, y, W - 2 * PAD, rh, fill, radius=0.12)
+        if state in ("grow", "merged"):
+            rect(s, PAD, y, 0.06, rh, FLAME if state == "grow" else INK, radius=0)
         col = FLAME if neck else MUTED
-        text(s, PAD + 0.16, y, 0.4, rh, no, size=14, bold=True, color=col, anchor=MSO_ANCHOR.MIDDLE)
-        text(s, PAD + 0.62, y, 2.4, rh, nm, size=13.5, bold=True, color=(FLAME if neck else INK), anchor=MSO_ANCHOR.MIDDLE, line=1.05)
-        text(s, PAD + 3.05, y, 5.2, rh, oj, size=13.5, bold=True, color=(C("FF9A52") if neck else FLAME_INK), anchor=MSO_ANCHOR.MIDDLE)
-        lh = 0.4; lx = W - PAD - 0.2
+        text(s, PAD + 0.16, y, 0.4, rh, no, size=13, bold=True, color=col, anchor=MSO_ANCHOR.MIDDLE)
+        nmcol = FLAME if neck else (MUTED if state == "shrink" else INK)
+        text(s, PAD + 0.62, y, 2.4, rh, nm.replace("\n", "\n"), size=12.5, bold=True, color=nmcol, anchor=MSO_ANCHOR.MIDDLE, line=1.05)
+        if state == "shrink":
+            ln = s.shapes.add_connector(MSO_CONNECTOR.STRAIGHT, Inches(PAD + 0.62), Inches(y + rh / 2), Inches(PAD + 2.4), Inches(y + rh / 2))
+            ln.line.color.rgb = FLAME; ln.line.width = Pt(1.5)
+        ojh = 0.38 if tag else rh
+        text(s, PAD + 3.05, y + (0.1 if tag else 0), 5.4, ojh, oj, size=12.5, bold=True,
+             color=(C("FF9A52") if neck else FLAME_INK), anchor=(MSO_ANCHOR.TOP if tag else MSO_ANCHOR.MIDDLE))
+        if tag:
+            tw = 0.075 * len(tag) + 0.3
+            tfill = C("F9DFCB") if state == "grow" else (INK if state == "merged" else (C("5A2E1A") if neck else HAIR))
+            tcol = FLAME_INK if state == "grow" else (PAPER if state in ("merged",) else (C("FF9A52") if neck else INK))
+            rect(s, PAD + 3.05, y + rh - 0.34, min(tw, 5.3), 0.24, tfill, radius=0.12)
+            text(s, PAD + 3.05, y + rh - 0.34, min(tw, 5.3), 0.24, tag, size=7.5, bold=True, color=tcol, align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
+        lh = min(0.4, rh - 0.16); lx = W - PAD - 0.2
         for slug in reversed(logos):
-            p = ico(slug, on_dark=neck); iw, ih = Image.open(p).size; lw = min(0.95, lh * iw / ih)
-            lx -= lw; pic(s, p, lx, y + (rh - lh) / 2, lw, lh); lx -= 0.16
+            pth = ico(slug, on_dark=neck); iw, ih = Image.open(pth).size; lw = min(0.95, lh * iw / ih)
+            lx -= lw; pic(s, pth, lx, y + (rh - lh) / 2, lw, lh); lx -= 0.16
         y += rh + gap
+    if note: note_(s, note)
 
-def floor(no, name, obj, title, specs, cp):
-    s = new_slide(); top(s, f"Этаж {no} · {name}"); h2(s, title)
-    cards3(s, specs, y=2.35, h=4.1)
-    text(s, PAD, 6.6, W - 2 * PAD, 0.6, [[("На примере Cyberpunk 2077: ", {"bold": True, "color": FLAME_INK}), cp]], size=12, color=MUTED, line=1.3)
+def note_(s, t): note(s, t, y=6.85)
 
 def floors():
     for f in FLOORS:
@@ -298,6 +319,42 @@ def slide_multi():
             text(s, tx + 0.12, 4.45, tw - 0.24, 0.5, sub, size=10.5, color=MUTED, align=PP_ALIGN.CENTER, line=1.2)
     text(s, PAD, 5.4, W - 2 * PAD, 1.2, MULTI_NOTE, size=13, color=MUTED, line=1.35)
     note(s, MULTI_SUB)
+
+def slide_trends():
+    s = new_slide(); top(s, "Блок 4 · Ситуация 1.5 · тренды"); h2(s, "Три тренда, которые действуют\nна цепочку уже сейчас")
+    specs = []
+    for k, (t, b, ic, ev) in enumerate(TRENDS_15):
+        sp = dict(kind="sage" if k == 0 else "tile", title=t, body=b, badge=ui_png(ic))
+        if ev: sp["kn"] = ev
+        specs.append(sp)
+    cards3(s, specs, y=2.35, h=4.1)
+    note(s, "Все три идут сверху — от владельцев движков, платформ и издателей, а не от запроса разработчиков.")
+
+def slide_regulators():
+    s = new_slide(); top(s, "Блок 4 · Ситуация 1.5 · регуляторы"); h2(s, "Четыре типа регуляторов")
+    gap = 0.18; w = (W - 2 * PAD - 3 * gap) / 4
+    for i, (t, b, ic) in enumerate(REGULATORS):
+        card_text(s, PAD + i * (w + gap), 2.35, w, 4.0, "hot" if i == 3 else "tile", t, b, badge=ui_png(ic), title_size=15, body_size=11.5)
+    note(s, REGULATORS_NOTE)
+
+def slide_transition():
+    s = new_slide(); top(s, "Блок 6 · механизм перехода"); h2(s, "За счёт чего карта переходит\nиз 1.5 в 2")
+    steps = TRANSITION; n = len(steps); gap = 0.22; w = (W - 2 * PAD - gap * (n - 1)) / n; y = 2.7; h = 2.3
+    for i, (t, sub) in enumerate(steps):
+        x = PAD + i * (w + gap); last = i == n - 1
+        rect(s, x, y, w, h, FLAME if last else TILE, radius=0.14)
+        text(s, x + 0.18, y + 0.22, w - 0.36, 0.3, f"{i+1:02d}", size=10, bold=True, color=(C("5A3416") if last else FLAME_INK))
+        text(s, x + 0.18, y + 0.6, w - 0.36, 0.9, t, size=14, bold=True, color=INK, line=1.08)
+        text(s, x + 0.18, y + 1.45, w - 0.36, 0.8, sub, size=10.5, color=(C("3E2A1C") if last else MUTED), line=1.3)
+        if not last:
+            a = s.shapes.add_shape(MSO_SHAPE.RIGHT_ARROW, Inches(x + w + 0.02), Inches(y + h / 2 - 0.1), Inches(gap - 0.04), Inches(0.2))
+            a.fill.solid(); a.fill.fore_color.rgb = FLAME; a.line.fill.background()
+    note(s, TRANSITION_NOTE, y=5.5)
+
+def slide_power():
+    s = new_slide(FLAME); top(s, "Блок 7 · где в индустрии место силы", hot=True); h2(s, POWER_TITLE)
+    cards3(s, [dict(kind=k, kn=kn, title=t, body=b, badge=ui_png(ic)) for k, kn, t, b, ic in POWER], y=2.35, h=4.1)
+    note(s, "Кто стоит на обоих центрах силы — витрине и движке, — тот и определяет правила для остальных этажей.", color=C("3E2A1C"))
 
 def slide_vs():
     s = new_slide(); top(s, "Проверка · объекты различаются"); h2(s, "Объекты соседних этажей\nне совпадают")
@@ -391,7 +448,7 @@ def slide_open():
         text(s, x + 0.28, y + 0.6, cw - 0.56, 0.45, t, size=18, bold=True, color=INK)
         text(s, x + 0.28, y + 1.1, cw - 0.56, 0.7, b, size=13, color=MUTED, line=1.3)
 
-SRC = SOURCES
+SRC = SOURCES_T3 + SOURCES
 def slide_sources():
     s = new_slide(); top(s, "Источники всех чисел"); h2(s, "Откуда взяты числа", size=30)
     rows = len(SRC) + 1; tb = s.shapes.add_table(rows, 3, Inches(PAD), Inches(1.95), Inches(W - 2 * PAD), Inches(4.9)).table
@@ -409,19 +466,25 @@ def slide_sources():
 
 def slide_terms():
     s = new_slide(); top(s, "Понятия такта 2"); h2(s, "Понятия, которыми пользовались", size=30)
-    gl = TERMS
-    w = (W - 2 * PAD - 0.2) / 2; h = 1.35
+    gl = TERMS + TERMS_T3
+    w = (W - 2 * PAD - 0.4) / 3; h = 1.15
     for i, (t, b) in enumerate(gl):
-        x = PAD + (i % 2) * (w + 0.2); y = 2.0 + (i // 2) * (h + 0.15)
+        x = PAD + (i % 3) * (w + 0.2); y = 2.0 + (i // 3) * (h + 0.12)
         rect(s, x, y, w, h, TILE, radius=0.14)
-        text(s, x + 0.28, y + 0.25, w - 0.56, 0.4, t, size=15, bold=True, color=INK)
-        text(s, x + 0.28, y + 0.68, w - 0.56, 0.6, b, size=12, color=MUTED, line=1.3)
+        text(s, x + 0.28, y + 0.18, w - 0.56, 0.35, t, size=13, bold=True, color=INK)
+        text(s, x + 0.28, y + 0.52, w - 0.56, 0.6, b, size=10, color=MUTED, line=1.25)
 
 # ── порядок ────────────────────────────────────────────────────────────────
-cover(); slide_gamedev(); slide_object(); section("01", "Карта\nуровней", "Восемь этажей, на каждом свой объект конкуренции.")
-slide_map(); floors(); slide_chain(); slide_pipeline(); slide_multi(); slide_vs()
-section("02", "Бутылочное\nгорлышко", "Ищем его тестом отказом, а не по деньгам на этаже.")
-slide_neck_def(); slide_failtest(); slide_class(); slide_cases(); slide_hidden(); slide_open(); slide_sources(); slide_terms()
+cover(); slide_gamedev(); slide_object()
+section("01", "Карта\nсейчас", "Вертикаль из восьми уровней и объект конкуренции на каждом.")
+slide_map(pill="Блок 1–2 · вертикаль и объекты по этажам"); slide_vs()
+section("02", "Горлышко\nи власть", "Ищем тестом отказом, а не по деньгам на этаже.")
+slide_neck_def(); slide_failtest(); slide_class(); slide_cases()
+section("03", "Запускаем\nвремя", "Тренды и регуляторы. Две перерисованные карты и механизм перехода между ними.")
+slide_trends(); slide_regulators()
+slide_map(rows=MAP_15, title=SIT15_TITLE, note=SIT15_NOTE, pill="Блок 4 · Ситуация 1.5 · карта")
+slide_map(rows=MAP_2, title=SIT2_TITLE, note=SIT2_NOTE, pill="Блок 5 · Ситуация 2 · карта")
+slide_transition(); slide_power(); slide_sources(); slide_terms()
 
 # проставляем общее число слайдов в счётчики
 N = len(prs.slides)

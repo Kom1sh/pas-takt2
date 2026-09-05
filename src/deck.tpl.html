@@ -113,6 +113,21 @@ b{font-weight:700}
 .ic{fill:currentColor}
 .lvl.neck .who .ic{color:var(--paper)!important}
 
+/* ============ состояния строк карты: 1.5 и 2 ============ */
+.lvl{position:relative}
+.lvl .tag{display:inline-block;margin-left:12px;padding:3px 10px;border-radius:999px;font-size:12.5px;
+  font-weight:700;letter-spacing:.03em;vertical-align:middle;white-space:nowrap}
+.lvl.grow{box-shadow:inset 4px 0 0 var(--flame)}
+.lvl.grow .tag{background:#F9DFCB;color:var(--flame-ink)}
+.lvl.shrink{opacity:.62;background:var(--paper-2)}
+.lvl.shrink .nm{text-decoration:line-through;text-decoration-thickness:2px;text-decoration-color:var(--flame)}
+.lvl.shrink .tag{background:var(--hair);color:var(--ink)}
+.lvl.merged{box-shadow:inset 4px 0 0 var(--ink);background:#FBF9F4}
+.lvl.merged .tag{background:var(--ink);color:var(--paper)}
+.lvl.neck .tag{background:rgba(242,106,27,.22);color:#FF9A52}
+.maplegend{display:flex;gap:26px;flex:none;margin-bottom:10px;font-size:13px;color:var(--muted)}
+.maplegend i{display:inline-block;width:14px;height:14px;border-radius:4px;vertical-align:-2px;margin-right:7px}
+
 /* ============ плитки логотипов ============ */
 .wall{display:grid;gap:11px;flex:1;min-height:0}
 .tile{background:var(--tile);border-radius:13px;display:flex;flex-direction:column;

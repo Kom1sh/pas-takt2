@@ -94,55 +94,65 @@ import math
 from content import (MAP, FLOORS, PLAT_VS_SHOP, VS_PAIRS, CHAIN, CHAIN_NOTE,
                      PIPELINE, PIPELINE_ICONS, PIPELINE_NOTE, PIPELINE_ACCENT, MEASURE_FIGS, MEASURE_CARDS,
                      MULTI, MULTI_NOTE, MULTI_SUB, FAILTEST, CASES, TERMS, SOURCES,
-                     SOURCES_NOTE, GATES, OUTS)
+                     SOURCES_NOTE, GATES, OUTS,
+                     TRENDS_15, REGULATORS, REGULATORS_NOTE, MAP_15, SIT15_TITLE, SIT15_NOTE,
+                     MAP_2, SIT2_TITLE, SIT2_NOTE, TRANSITION, TRANSITION_NOTE, POWER, POWER_TITLE,
+                     TERMS_T3, SOURCES_T3)
 
 FUNNEL = ('<div class="fn"><div class="cap">ЭТАЖИ 01–07</div><div class="cone">'
           + "".join('<i style="top:%.2f%%"></i>' % (b * 100 / 7.0) for b in range(1, 7))
           + '</div><div class="neck"><b>08</b><s>ВИТРИНА</s></div>'
             '<div class="arw"></div><div class="out">ИГРОК</div></div>')
 
-def nl(t):
-    return t.replace("\n", "<br>")
+def nl(t): return t.replace("\n", "<br>")
 
 def anchor(icon, logos, kn):
     inner = ""
     if logos:
         cls = "logos solo" if len(logos) == 1 else "logos"
         inner += '<div class="%s">' % cls + "".join(ico(x) for x in logos) + "</div>"
-    if icon:
-        inner += ui(icon)
-    if kn:
-        inner += '<div class="kn">%s</div>' % kn
+    if icon: inner += ui(icon)
+    if kn: inner += '<div class="kn">%s</div>' % kn
     return '<div class="anchor">%s</div>' % inner if inner else ""
 
 def card(kind, kn, title, body, icon=None, logos=None):
-    return ('<div class="card %s">%s<h4>%s</h4><p>%s</p></div>'
-            % (kind, anchor(icon, logos, kn), nl(title), body))
+    return '<div class="card %s">%s<h4>%s</h4><p>%s</p></div>' % (kind, anchor(icon, logos, kn), nl(title), body)
+
+def maprow(no, nm, oj, logos, state=None, tag="", i=0):
+    cls = "lvl" + (" " + state if state else "")
+    tagh = '<span class="tag">%s</span>' % tag if tag else ""
+    return ('<div class="%s r" style="--i:%d"><span class="no">%s</span><span class="nm">%s</span>'
+            '<span class="oj">%s%s</span><span class="who">%s</span></div>'
+            % (cls, i, no, nl(nm), oj, tagh, "".join(ico(x) for x in logos)))
+
+def mapslide(title_html, rows, note, legend=None):
+    h = '<div class="maphead"><span></span><span>Уровень</span><span>Объект конкуренции</span><span>Кто стоит</span></div>'
+    body = "".join(maprow(no, nm, oj, lg, st, tg, 2 + k) for k, (no, nm, oj, lg, st, tg) in enumerate(rows))
+    leg = ('<div class="maplegend r" style="--i:1">%s</div>' % "".join(
+        '<span><i style="%s"></i>%s</span>' % (st, lab) for st, lab in legend)) if legend else ""
+    tailn = '<p class="note after r" style="--i:12">%s</p>' % note if note else ""
+    return title_html + leg + h + '<div class="map">' + body + '</div>' + tailn
 
 S = []
-
 rays = ('<svg class="rays" viewBox="0 0 200 200" fill="none" stroke="rgba(22,20,15,.34)" stroke-width=".7">'
         + "".join('<line x1="100" y1="100" x2="%.1f" y2="%.1f"/>'
-                  % (100 + 150 * math.cos(a * math.pi / 24), 100 + 150 * math.sin(a * math.pi / 24))
-                  for a in range(48))
-        + '<circle cx="100" cy="100" r="46" stroke="rgba(22,20,15,.4)"/>'
-          '<circle cx="100" cy="100" r="72" stroke="rgba(22,20,15,.22)"/></svg>')
-S.append(('Геймдев · Такт 2', 'hot cover', rays + top("ПАС · ИТ-1 · 3 курс · 2026/27") + '''
-  <h1 class="r" style="--i:0">Геймдев</h1>
-  <div class="sub r" style="--i:1">Такт 2. Объекты конкуренции<br>и бутылочные горлышки</div>
-  <div class="meta-b r" style="--i:2"><span>Разбираем на Cyberpunk 2077</span>
-    <span>8 этажей · 1 горлышко</span></div>'''))
+                  % (100 + 150 * math.cos(a * math.pi / 24), 100 + 150 * math.sin(a * math.pi / 24)) for a in range(48))
+        + '<circle cx="100" cy="100" r="46" stroke="rgba(22,20,15,.4)"/><circle cx="100" cy="100" r="72" stroke="rgba(22,20,15,.22)"/></svg>')
 
-S.append(('Что такое геймдев', '', top("Определение") + '''
+S.append(('Геймдев · финальный пленар', 'hot cover', rays + top("ПАС · ИТ-1 · 3 курс · финальный пленар") + '''
+  <h1 class="r" style="--i:0">Геймдев</h1>
+  <div class="sub r" style="--i:1">Карта уровней конкуренции:<br>сейчас, Ситуация 1.5 и Ситуация 2</div>
+  <div class="meta-b r" style="--i:2"><span>Разбираем на Cyberpunk 2077 и CD Projekt</span><span>8 этажей · 1 горлышко · 2 сценария</span></div>'''))
+
+S.append(('Границы: что такое геймдев', '', top("Блок 1 · границы отрасли") + '''
   <h2 class="r" style="--i:0">Что такое геймдев</h2>
   <div class="cards r" style="--i:1;grid-template-columns:1.5fr 1fr">
-    <div class="card mid">''' + '<div class="anchor">' + ui("play") + '</div>' + '''
+    <div class="card mid"><div class="anchor">''' + ui("play") + '''</div>
       <p style="font-size:25px;line-height:1.42;color:var(--ink);max-width:none">Программные интерактивные системы, в которых пользователь <b>добровольно действует в рамках искусственных правил</b>, а система непрерывно отвечает на его действия, — с доведением продукта и его поддержки до аудитории <b>через цифровые площадки дистрибуции</b>.</p></div>
-    ''' + card("dark mid", None, "Не геймдев",
-               "Веб-дизайн, тренажёры и обучающие симуляторы, классические приложения, розничная продажа игр, настольные игры.", "no") + '''
+    ''' + card("dark mid", None, "Не геймдев", "Веб-дизайн, тренажёры и обучающие симуляторы, классические приложения, розничная продажа игр, настольные игры.", "no") + '''
   </div>'''))
 
-S.append(('Объект конкуренции', '', top("Понятие") + '''
+S.append(('Понятие: объект конкуренции', '', top("Блок 2 · понятие") + '''
   <h2 class="r" style="--i:0">Объект конкуренции — то,<br>обладание которым даёт преимущество</h2>
   <div class="cards c3 r" style="--i:1">'''
   + card("tile", None, "Право, стандарт,\nопыт, внимание", "Это можно удерживать. А пока удерживаешь — другим сюда хода нет.", "key")
@@ -150,86 +160,26 @@ S.append(('Объект конкуренции', '', top("Понятие") + '''
   + card("dark", None, "Проверка: сравни\nс этажом выше", "Объект тот же — значит, это один уровень, а не два. Если объект нельзя измерить — мы его не называем.", "compare")
   + '</div>'))
 
-S.append(('Раздел 01 — карта', 'dark sec', '<div class="huge">01</div>' + top("Раздел 01") + '''
-  <h1 class="r" style="--i:0">Карта<br>уровней</h1>
-  <p class="note r" style="--i:1">Восемь этажей, на каждом свой объект конкуренции.</p>'''))
+S.append(('Раздел 01 — карта сейчас', 'dark sec', '<div class="huge">01</div>' + top("Раздел 01") + '''
+  <h1 class="r" style="--i:0">Карта<br>сейчас</h1>
+  <p class="note r" style="--i:1">Вертикаль из восьми уровней и объект конкуренции на каждом.</p>'''))
 
-S.append(('Карта уровней', '', top("Схема · разметка карты") + '''
-  <div class="maphead"><span></span><span>Уровень</span><span>Объект конкуренции</span><span>Кто стоит</span></div>
-  <div class="map">'''
-  + "".join(row(no, nl(nm), oj, logos, "", neck=(no == "08")) for no, nm, oj, logos in MAP)
-  + '</div>'))
+S.append(('Карта уровней · сейчас', '', top("Блок 1–2 · вертикаль и объекты по этажам") +
+  mapslide('', [(no, nm, oj, lg, None, "") for no, nm, oj, lg in MAP], None)))
 
-for f in FLOORS:
-    body = (top(f["pill"]) + '\n  <h2 class="r" style="--i:0">%s</h2>\n' % nl(f["title"])
-            + '  <div class="cards c3 r" style="--i:1">'
-            + "".join(card(k, kn, t, b, ic, lg) for k, kn, t, b, ic, lg in f["cards"])
-            + '</div>\n')
-    if f["no"] == "08":
-        body += '  <div class="pvs r" style="--i:2">%s</div>\n' % PLAT_VS_SHOP
-    else:
-        body += ('  <p class="note after r" style="--i:2"><b style="color:var(--flame-ink)">'
-                 'На примере Cyberpunk 2077:</b> %s</p>\n' % f["cp"])
-    S.append(("%s · %s" % (f["no"], f["title"].split(":")[0]), '', body))
-
-S.append(('Цепочка удержания', '', top("Этаж 08 · цепочка удержания") + '''
-  <h2 class="r" style="--i:0;margin-bottom:14px">Как время игрока превращается<br>в его пожизненную ценность</h2>
-  <div class="pipe compact r" style="--i:1">'''
-  + '<div class="ar"></div>'.join(
-      '<div class="st mid%s"><div class="no">%02d</div><h5>%s</h5><p>%s</p></div>'
-      % (" last" if i == len(CHAIN) - 1 else "", i + 1, nl(t), sub_)
-      for i, (t, sub_) in enumerate(CHAIN))
-  + '''</div>
-  <p class="note after r" style="--i:2">%s</p>''' % CHAIN_NOTE))
-
-S.append(('Пайплайн выхода на витрину', '', top("Этаж 08 · зависимость разработчика") + '''
-  <h2 class="r" style="--i:0;margin-bottom:14px">Что нужно разработчику,<br>чтобы игра появилась на витрине</h2>
-  <div class="pipe r" style="--i:1">'''
-  + '<div class="ar"></div>'.join(
-      '<div class="st"><div class="no">ШАГ %d</div>%s<h5>%s</h5><p>%s</p></div>'
-      % (i + 1, ui(PIPELINE_ICONS[i]), t, b)
-      for i, (t, b) in enumerate(PIPELINE))
-  + '''</div>
-  <p class="note after r" style="--i:2">%s <b style="color:var(--flame-ink)">%s</b></p>'''
-    % (PIPELINE_NOTE, PIPELINE_ACCENT)))
-
-def grp2(cap, tiles, cols, hot=False):
-    return ('<div class="wallgrp%s"><div class="cap">%s</div><div class="grid" '
-            'style="grid-template-columns:repeat(%d,1fr)">%s</div></div>'
-            % (" hot" if hot else "", cap, cols, "".join(tiles)))
-
-S.append(('Позиция на одном этаже — рычаг на другом', '', top("Кто стоит на нескольких этажах") + '''
-  <h2 class="r" style="--i:0;margin-bottom:20px">Позиция на одном этаже —<br>рычаг на другом</h2>
-  <div class="cards c2 r" style="--i:1;flex:0 0 auto">'''
-  + "".join(
-      '<div class="card"><div class="anchor"><div class="kn">%s</div></div>'
-      '<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">%s</div></div>'
-      % (name, "".join(
-          '<div style="background:var(--paper-2);border-radius:12px;padding:14px 12px;text-align:center">'
-          '<div style="font-size:12px;font-weight:700;letter-spacing:.06em;color:var(--muted);'
-          'text-transform:uppercase;margin-bottom:10px">%s</div>'
-          '<div style="display:flex;justify-content:center;margin-bottom:10px">%s</div>'
-          '<div style="font-size:13px;font-weight:700;line-height:1.2">%s</div></div>'
-          % (lab, ico(slug), sub) for lab, slug, sub in items))
-      for name, items in MULTI)
-  + '''</div>
-  <p class="note after r" style="--i:2">%s</p>
-  <p class="note r" style="--i:3;margin-top:10px">%s</p>''' % (MULTI_NOTE, MULTI_SUB)))
-
-S.append(('Соседние этажи не совпадают', '', top("Проверка · объекты различаются") + '''
+S.append(('Объекты соседних этажей не совпадают', '', top("Блок 2 · проверка") + '''
   <h2 class="r" style="--i:0;margin-bottom:18px">Объекты соседних этажей<br>не совпадают</h2>
   <div style="display:flex;flex-direction:column;gap:11px;flex:1;min-height:0">'''
   + "".join('<div class="vs r" style="--i:%d"><div class="side"><div class="lb">%s</div><div class="tx">%s</div></div>'
-            '<div class="mid">≠</div><div class="side" style="padding-left:22px"><div class="lb">%s</div>'
-            '<div class="tx">%s</div></div></div>' % (1 + i, a, at, b, bt)
-            for i, (a, at, b, bt) in enumerate(VS_PAIRS))
+            '<div class="mid">≠</div><div class="side" style="padding-left:22px"><div class="lb">%s</div><div class="tx">%s</div></div></div>'
+            % (1 + i, a, at, b, bt) for i, (a, at, b, bt) in enumerate(VS_PAIRS))
   + '</div>'))
 
 S.append(('Раздел 02 — горлышко', 'dark sec', '<div class="huge">02</div>' + top("Раздел 02") + '''
-  <h1 class="r" style="--i:0">Бутылочное<br>горлышко</h1>
-  <p class="note r" style="--i:1">Ищем его тестом отказом, а не по деньгам на этаже.</p>'''))
+  <h1 class="r" style="--i:0">Горлышко<br>и власть</h1>
+  <p class="note r" style="--i:1">Ищем тестом отказом, а не по деньгам на этаже.</p>'''))
 
-S.append(('Понятие горлышка', '', top("Понятие · бутылочное горлышко") + '''
+S.append(('Понятие горлышка', '', top("Блок 3 · понятие") + '''
   <h2 class="r" style="--i:0">Уровень, где мало игроков,<br>а зависят от них все</h2>
   <div class="cards r" style="--i:1;grid-template-columns:1.5fr 1fr;margin-top:24px">
     <div class="col">'''
@@ -240,15 +190,15 @@ S.append(('Понятие горлышка', '', top("Понятие · буты
     <div class="card" style="padding:24px">''' + FUNNEL + '''</div>
   </div>'''))
 
-S.append(('Тест отказом', '', top("Цепочка зависимостей · тест отказом") + '''
+S.append(('Тест отказом', '', top("Блок 3 · тест отказом") + '''
   <h2 class="r" style="--i:0;margin-bottom:22px">Что будет с цепочкой,<br>если этот уровень откажет</h2>
   <div class="chain">'''
   + "".join('<div class="ch%s r" style="--i:%d"><h4>%s</h4><p>%s</p><div class="verd">%s</div></div>'
             % (" dead" if d else "", 1 + i, t, b, v) for i, (t, b, v, d) in enumerate(FAILTEST))
   + '''</div>
-  <p class="note after r" style="--i:6">Три уровня из четырёх заменяемы. Жёсткая зависимость ровно одна.</p>'''))
+  <p class="note after r" style="--i:6">Три уровня из четырёх заменяемы. Жёсткая зависимость ровно одна — поэтому власть на восьмом этаже.</p>'''))
 
-S.append(('Горлышко — уровень витрин', 'dark', top("Горлышко · обоснование") + '''
+S.append(('Горлышко — уровень витрин', 'dark', top("Блок 3 · почему власть там") + '''
   <h2 class="r" style="--i:0">Горлышко — <span style="color:var(--flame)">уровень витрин</span>,<br>а не отдельная компания</h2>
   <div class="figs r" style="--i:1;margin-top:38px">
     <div class="fig"><div class="n">75%</div><div class="l">выручки PC-дистрибуции у Steam — это лишь PC-проекция горлышка</div></div>
@@ -257,56 +207,78 @@ S.append(('Горлышко — уровень витрин', 'dark', top("Го�
   </div>
   <div class="cards c2 r" style="--i:2;margin-top:40px">'''
   + card("dark mid", None, "Что мешает войти", "Купленная библиотека не переносится. Уйти — значит бросить всё, за что заплачено.")
-  + card("dark mid", None, "Контраргумент", "Steam — только PC. Поэтому горлышко не компания, а <b>уровень</b>: в каждой экосистеме своя витрина.")
+  + card("dark mid", None, "Почему уровень, а не компания", "Steam — только PC. В каждой экосистеме своя витрина, и в каждой она монополист. Власть — у уровня.")
   + '</div>'))
 
-S.append(('Три случая отключения игры', '', top("Горлышко · проверенные случаи") + '''
+S.append(('Три случая отключения игры', '', top("Блок 3 · проверенные случаи") + '''
   <h2 class="r" style="--i:0;margin-bottom:22px">Три случая отключения<br>игры витриной</h2>
   <div class="cards c3 r" style="--i:1">'''
   + "".join('<div class="card"><div class="anchor"><div class="badge">%s</div><div class="kn">%s</div></div>'
             '<h4>%s</h4><p>%s</p><p style="margin-top:16px;color:var(--ink);font-weight:700">%s</p></div>'
-            % (ico(sl), sub, t, b, k) for sl, t, sub, b, k in CASES)
+            % (ico(sl), sb, t, b, k) for sl, t, sb, b, k in CASES)
   + '''</div>
   <p class="note after r" style="--i:2">Игра была готова и куплена. Отказал <b style="color:var(--flame-ink)">только уровень витрины</b> — и этого хватило.</p>'''))
 
-S.append(('Скрытые горлышки', '', top("Скрытые горлышки") + '''
-  <h2 class="r" style="--i:0">Скрытые горлышки:<br>сертификация, издатель, мощности</h2>
+S.append(('Раздел 03 — динамика', 'dark sec', '<div class="huge">03</div>' + top("Раздел 03") + '''
+  <h1 class="r" style="--i:0">Запускаем<br>время</h1>
+  <p class="note r" style="--i:1">Тренды и регуляторы. Две перерисованные карты и механизм перехода между ними.</p>'''))
+
+S.append(('Тренды Ситуации 1.5', '', top("Блок 4 · Ситуация 1.5 · тренды") + '''
+  <h2 class="r" style="--i:0">Три тренда, которые действуют<br>на цепочку уже сейчас</h2>
   <div class="cards c3 r" style="--i:1">'''
-  + card("tile", None, "Сертификация\nи возрастной рейтинг", "Не прошёл ESRB или PEGI — на консоль не вышел. Обойти нельзя.", "shield")
-  + card("tile", None, "Нет издателя —\nнет игры", "Команда сильная, права есть, а издателя нет. Для инди горлышко — шестой этаж, а не восьмой.", "no")
-  + card("tile", None, "Мощности подрядчиков", "Cyberpunk сорвал не аутсорс, а скоуп и старые консоли. Но конвейер студий — признак нехватки.", "clock")
+  + "".join(card("sage" if i == 0 else "tile", ev, t, b, ic) for i, (t, b, ic, ev) in enumerate(TRENDS_15))
   + '''</div>
-  <p class="note after r" style="--i:2">Горлышко ищется не по выручке этажа, а по отсутствию альтернативы у тех, кто зависит.</p>'''))
+  <p class="note after r" style="--i:2">Все три идут <b>сверху</b> — от владельцев движков, платформ и издателей, а не от запроса разработчиков.</p>'''))
 
-S.append(('Открытый вопрос', 'hot', top("Открытый вопрос · выносим в зал") + '''
-  <h2 class="r" style="--i:0;font-size:80px;font-weight:900;letter-spacing:-.038em;line-height:1.0">Открытый вопрос:<br>где проходит граница рынка</h2>
-  <div class="cards c2 r" style="--i:1;margin-top:auto;width:1040px;align-self:center;flex:0 0 auto">'''
-  + card("mid", "Рынок = PC", "Горлышко — Steam", "75% выручки, альтернатив практически нет.")
-  + card("mid", "Рынок = гейминг целиком", "Горлышек несколько", "По одному на экосистему — и каждое монополист в своей.")
-  + '</div>\n  <div class="mt"></div>'))
+S.append(('Регуляторы', '', top("Блок 4 · Ситуация 1.5 · регуляторы") + '''
+  <h2 class="r" style="--i:0;margin-bottom:20px">Четыре типа регуляторов</h2>
+  <div class="cards c4 r" style="--i:1">'''
+  + "".join('<div class="card%s"><div class="anchor">%s</div><h4>%s</h4><p>%s</p></div>'
+            % (" hot" if i == 3 else "", ui(ic), t, b) for i, (t, b, ic) in enumerate(REGULATORS))
+  + '''</div>
+  <p class="note after r" style="--i:2">%s</p>''' % REGULATORS_NOTE))
 
-HALF = len(SOURCES) // 2 + len(SOURCES) % 2
+S.append(('Карта · Ситуация 1.5', '', top("Блок 4 · Ситуация 1.5 · карта") +
+  mapslide('<h2 class="r" style="--i:0;font-size:38px;margin-bottom:10px">%s</h2>' % nl(SIT15_TITLE), MAP_15, SIT15_NOTE,
+           legend=[("background:#F26A1B", "усиливается"), ("background:#D3CCBE", "сокращается"), ("background:#14130F", "горлышко")])))
+
+S.append(('Карта · Ситуация 2', '', top("Блок 5 · Ситуация 2 · карта") +
+  mapslide('<h2 class="r" style="--i:0;font-size:38px;margin-bottom:10px">%s</h2>' % nl(SIT2_TITLE), MAP_2, SIT2_NOTE,
+           legend=[("background:#F26A1B", "усиливается"), ("background:#FBF9F4;border-left:4px solid #16140F;border-radius:3px", "поглотил соседний этаж"), ("background:#14130F", "горлышко")])))
+
+S.append(('Механизм перехода', '', top("Блок 6 · механизм перехода") + '''
+  <h2 class="r" style="--i:0;margin-bottom:14px">За счёт чего карта переходит<br>из 1.5 в 2</h2>
+  <div class="pipe r" style="--i:1">'''
+  + '<div class="ar"></div>'.join(
+      '<div class="st mid%s"><div class="no">%02d</div><h5>%s</h5><p>%s</p></div>'
+      % (" last" if i == len(TRANSITION) - 1 else "", i + 1, nl(t), b) for i, (t, b) in enumerate(TRANSITION))
+  + '''</div>
+  <p class="note after r" style="--i:2">%s</p>''' % TRANSITION_NOTE))
+
+S.append(('Место силы', 'hot', top("Блок 7 · где в индустрии место силы") + ('''
+  <h2 class="r" style="--i:0">%s</h2>
+  <div class="cards c3 r" style="--i:1">''' % nl(POWER_TITLE))
+  + "".join(card(k, kn, t, b, ic) for k, kn, t, b, ic in POWER)
+  + '''</div>
+  <p class="note after r" style="--i:2">Кто стоит на обоих центрах силы — витрине и движке, — тот и определяет правила для остальных этажей.</p>'''))
+
+ALLSRC = SOURCES_T3 + SOURCES
+HALF = len(ALLSRC) // 2 + len(ALLSRC) % 2
 def src_col(items):
-    return "".join(
-        '<div class="srow"><span class="num">%s</span>'
-        '<a class="lnk" href="%s" target="_blank" rel="noopener">%s</a>'
-        '<span class="whr">%s</span></div>' % (n, url, dom, w)
-        for n, w, dom, url in items)
-
-S.append(('Источники', '', top("Источники всех чисел") + '''
+    return "".join('<div class="srow"><span class="num">%s</span><a class="lnk" href="%s" target="_blank" rel="noopener">%s</a>'
+                   '<span class="whr">%s</span></div>' % (n, url, dom, w) for n, w, dom, url in items)
+S.append(('Источники', '', top("Источники всех чисел") + ('''
   <h2 class="r" style="--i:0;font-size:42px;margin-bottom:14px">Откуда взяты числа</h2>
   <div class="srcgrid r" style="--i:1">
     <div><div class="hd">Число · где в деке · источник</div>%s</div>
     <div><div class="hd">Число · где в деке · источник</div>%s</div>
   </div>
-  <p class="note after r" style="--i:2">%s</p>'''
-  % (src_col(SOURCES[:HALF]), src_col(SOURCES[HALF:]), SOURCES_NOTE)))
+  <p class="note after r" style="--i:2">%s</p>''' % (src_col(ALLSRC[:HALF]), src_col(ALLSRC[HALF:]), SOURCES_NOTE))))
 
-S.append(('Понятия такта 2', '', top("Понятия такта 2") + '''
-  <h2 class="r" style="--i:0;font-size:44px;margin-bottom:16px">Понятия, которыми пользовались</h2>
-  <div class="gl">'''
-  + "".join('<div class="gi r" style="--i:%d"><dt>%s</dt><dd>%s</dd></div>' % (1 + i, t, b)
-            for i, (t, b) in enumerate(TERMS))
+S.append(('Понятия', '', top("Понятия тактов 2 и 3") + '''
+  <h2 class="r" style="--i:0;font-size:42px;margin-bottom:14px">Понятия, которыми пользовались</h2>
+  <div class="gl" style="grid-template-columns:1fr 1fr 1fr">'''
+  + "".join('<div class="gi r" style="--i:%d"><dt>%s</dt><dd>%s</dd></div>' % (1 + i, t, b) for i, (t, b) in enumerate(TERMS + TERMS_T3))
   + '</div>'))
 
 # ── сборка ───────────────────────────────────────────────────────────────
